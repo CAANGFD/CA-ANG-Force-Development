@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CA ANG Force Development</title>
+    
+    <!-- React & Tailwind -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@0.292.0"></script>
+
+    <style>
+        /* THEME: CA ANG STANDARD (Enhanced) */
+        :root {
+            --af-blue: #00308F;      /* Official Air Force Blue */
+            --af-dark: #0B1F3F;      /* Darker Navy for Contrast */
+            --af-gold: #FFC107;      /* Accent Gold */
+            --bg-body: #F3F4F6;      /* Light Gray Background */
+            --bg-card: #FFFFFF;      /* White Card Background */
+        }
+        body {
+            background-color: var(--bg-body);
+            color: #1F2937;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-enter {
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Unit Patch Hover Effect */
+        .patch-hover {
+            transition: all 0.3s ease;
+        }
+        .patch-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Timeline Connector */
+        .timeline-connector {
+            position: absolute;
+            left: 24px;
+            top: 48px;
+            bottom: -16px;
+            width: 2px;
+            background-color: #E5E7EB;
+            z-index: 0;
+        }
+        .last-item .timeline-connector { display: none; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- Icon Wrapper (Prevents Flickering) ---
+        const Icon = ({ name, size = 18, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons({
+                        root: iconRef.current ? iconRef.current.parentNode : document,
+                        name: name,
+                        attrs: { width: size, height: size, class: className }
+                    });
+                }
+            }, [name, size, className]);
+            return <span ref={iconRef}><i data-lucide={name} className={className}></i></span>;
+        };
+
+        // --- CONTENT & LINKS CONFIGURATION ---
+        
+        const IMAGES = {
+            logo: "https://lh3.googleusercontent.com/sitesv/AAzXCkeRj3L7Wr3A1GgT8aNuCBb8xNiFBCCaLGNhfPn2ih-sXeoKkZ-9Fr4YfTkjRknnXVUK1xL3-y_egSU4M8RX9xWXBuJ5vErlAnKpm5NcuBsUvrrFiQ3_mMtaTdTobvCPNzeGe8DQcya16NnKJXumWH3_ddj48fAijvI6alNwS6h-2wWYXVO3uVFnAlo=w16383",
+            unit129: "https://lh3.googleusercontent.com/sitesv/AAzXCkdzXId3pG0vuzrDBJF2hld3Y_2jjjlkevIuJtVigh9--9R5--m80FusmcW-2vEXpAMNqNsjuMg1JSqUzXbutGCj3dQ4gvy0GHq9Eoi40sXRUcJtcBKmv8xvqUowGA7cGnMbkl2doj2nHXWzIwEP6Wq6EvrkRWPBObTFO83_g6L07WW3Px1zrqD2cUhcc7Lmd8CyWSBvWY5ymRRS_zHEyIWpXFCXEHRmapPjgZ8=w1280",
+            unit144: "https://lh3.googleusercontent.com/sitesv/AAzXCket87zmUpTblTHBp1wyghj_pGtJLOFWV_1KiZNthp668TOSkkPmlZgbztMxygNjuvGu4MiG_Y8H9RL19qFchA8QEhWb0a8IDzHUwuMeC4V7cbfRMf0bxxsE3ROAAgKhSnrCKfXerdsjn17c6JDg2Z_P5dE969ubRz0F_ilrpLBdCKrjtt-Nc2LO5a4TuIFyORt9v_9IB3X6NLVJmRTZU21vsafEtbDsYhp9=w1280",
+            unit146: "https://lh3.googleusercontent.com/sitesv/AAzXCkcgXBlz5XYKzuAf-DYz6y21Bm3uCQkuZuP_t1VUDPrPujTvCzXas_4RFRTuca1L3sFlWte9cKvw3i2xQ-2no_2onKpX_VbdMo1MwYt4U-GAVGPGIy7xAQVVDnuLUtITGsWHSsSI9U9g5HeXQ-d8DZRCqyMOZo4cNt1_Syeqj5RU2l9nLLx_GFz1ex1vhjy2x_yCnj-U_tNSpzLpPJU78HGWkNTpq3XvuifA=w1280",
+            unit163: "https://lh3.googleusercontent.com/sitesv/AAzXCkeDbG5Koo7cFVwpEcM4t_oR2kk4FEwicw-mZr-KNL5ZZOCBJLlZxXQABhl-J6FsoKO4BKQK7qxTTTUPZqCeIzKyqf71fMcOlgsdwmMqSL9ODVGsxwkEhwFXmB6jMePDvDlOP9SXcFl9MD0PWK-nyGJV31W2kS9m2zOBqSyAmMQnYKskNPM5JPN-qiKRDqGNUXaX_txvYN0phkw-zvYe9oIFAHiTSMaWoD7pgs4=w1280",
+            unit195: "https://lh3.googleusercontent.com/sitesv/AAzXCkfxDCinMbnH8PHQa6kafTTMb6uA6hBzvlI4qDb3fTxijRUE1aXfziTADnwxhhOOUGRcr7Oxgp1VWiXAITwclNFt4AaAcrS1juGy9VvTcOmDoIFEQUGxJGsHeA2-GvsAPvQfQlqiOirtpQ91TWqhLzwYE1MUEudwhZ4FLCSnR62tQLRG3gcIL4wz9sJ22QJxc6UmkkTOGd2Pmnb4wbyXfzlc4IG_IRe7N2ZH8Pc=w1280",
+            commander: "https://lh3.googleusercontent.com/sitesv/AAzXCkfeF9jvXjgardI0RvcuNdzNMeCozJ7X0KRXpV1H8huJATbu6pcgSZGO9aniboBsqEvECLJtTK013CFpvFqanSf9zrnea-3X22q68D7L4r-a1bY3Hl9rdZW83mxQ3AWSycDw6OnKr0Io0Oc0toX8EpsjvXCnUSpS7aPz88VGH_3BwVdx_R1WOwnb04XuPbLCcaWVK8qnslfXkyScgaAp1kBgwDOrJeUTawdD=w1280",
+            chief: "https://lh3.googleusercontent.com/sitesv/AAzXCkcEgRR8FHLKftFLDZS77uFfpMLwpzA1Bo22yGOCxN05NmufwwULrmh2kJKIf5jPFJt9qm5k4lK0Ia7FI0HXjziLB1Bqn6OaK_PYNR_um_56Lg_tflNrliabQqp7mxDF4tMGObU_A8FBF9Fd4QEgUs37sXexKQ4QWp9ypcOEFNURykZjPUNavA7R_fJ73DRozif7sFmBcjMoBH1Hdi_xBydynC5Cd7esSJSf6uM=w1280",
+            blueBook: "https://lh3.googleusercontent.com/sitesv/AAzXCkcDrCG4xwEpkoZGDpYMxk6afDkcuNr2et13JXjLtVl0P2xdsBKz28XWexpQi-RXMsx1F0CyGis8hjVpgQIQWTeO6WBOGCHefBOx6Cyz7t9goUER2KTKl0eFlj5UE1vkfex-4Rw5Dipz0SMhqIrvNtg4IVn3wvoe4JrO0n0E1VZqc7DOpIBMXWWfAaGwO27d_921U_4HO6DXtgYASeBoZqY-RrN_UthC-cTfccI=w1280",
+            brownBook: "https://lh3.googleusercontent.com/sitesv/AAzXCke8skZ0_uFovkLkBAjrzJ5WcNHFWNTktKPYEGEvT32JFUhcaS8vyLl2OWrl3l7mCrE5GW7WE6NWfTQV8GwBqDLLBuWXfq-LCOVWwIQJVBsKfGVdM9XwodCP9GRVuY9eYpBIZ9MIMZj-5YGxa71E7P1ABb8-nwHTFrrr2NNfMI-twsXykoaUtOMaziA0rpkvvAehvw1Nqdelw6U96FCZhESDkcFb0bbCIzAG6iU=w1280",
+            blueprint: "https://lh3.googleusercontent.com/sitesv/AAzXCkdVW9-kq4HJLeKeWkNknTue4T-KEWfZdwRILibS_pbHFQK6_uTuEacG62ukkMkO6Bkm_6j4c5QVhCo77NyNDEHEH1-n8WWu8cvOg6SIpMwrmXKnbqLuIGiy79mHF24a22X8v3-ATf_EjiupDHUDKGil30qzulfSwxddrVu4ptnmeDdZp_rHa3NqNJDzHbXDGU3obi1vPRsSHH_FO4fccju8E6kqARcD_gcb=w1280"
+        };
+
+        const ANNOUNCEMENTS = [
+            { id: 1, title: 'CFDC 300 Registration Open', date: 'Oct 15, 2023', type: 'Training', link: '#' },
+            { id: 2, title: 'New GPC Reading List Added', date: 'Oct 12, 2023', type: 'Strategic', link: '#' },
+            { id: 3, title: 'Officer Promotion Board (Maj-Lt Col)', date: 'Oct 05, 2023', type: 'Admin', link: '#' },
+        ];
+
+        const LEADERSHIP = [
+            { 
+                name: 'Major General Steven J. Butow', 
+                title: 'Commander', 
+                org: 'California Air National Guard',
+                link: 'https://www.doctrine.af.mil/Portals/61/documents/Airman_Development/BlueBook.pdf',
+                image: IMAGES.commander
+            },
+            { 
+                name: 'Chief Master Sergeant Seth M. Zweben', 
+                title: 'State Command Chief', 
+                org: 'California Air National Guard',
+                link: 'https://calguard.ca.gov/ca_statecommandchief/',
+                image: IMAGES.chief
+            }
+        ];
+
+        const UNITS = [
+            { name: '129th RQW', link: 'https://www.129rqw.ang.af.mil/', image: IMAGES.unit129 },
+            { name: '144th FW', link: 'https://www.144fw.ang.af.mil/', image: IMAGES.unit144 },
+            { name: '146th AW', link: 'https://www.146aw.ang.af.mil/', image: IMAGES.unit146 },
+            { name: '163rd ATKW', link: 'https://www.163atkw.ang.af.mil/', image: IMAGES.unit163 },
+            { name: '195th WG', link: 'https://www.195wg.ang.af.mil/', image: IMAGES.unit195 },
+        ];
+
+        const RESOURCES = [
+            { id: '1', title: 'AFI 36-2618 (The Enlisted Force Structure)', category: 'Regulations', type: 'PDF', description: 'The "Little Brown Book".', link: '#' },
+            { id: '2', title: 'Airman Leadership Qualities (ALQs)', category: 'ALQs', type: 'Link', description: 'Interactive ALQ guide.', link: '#' },
+            { id: '3', title: 'CSAF Reading List', category: 'Reading', type: 'Link', description: 'Chief of Staff recommendations.', link: '#' },
+            { id: '4', title: 'MyFSS', category: 'Key Sites', type: 'Link', description: 'Personnel actions portal.', link: '#' },
+            { id: '5', title: 'vMPF', category: 'Key Sites', type: 'Link', description: 'Virtual MPF.', link: '#' },
+        ];
+
+        const ENLISTED_TIERS = [
+            {
+                id: 'airman', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'user',
+                focus: 'Developing Technical Proficiency',
+                desc: 'Focus on adapting to military requirements, achieving occupational proficiency, and becoming a productive member of the Air Force.',
+                steps: [
+                    { name: 'Basic Training', type: 'Entry' },
+                    { name: 'Tech School', type: 'Training' },
+                    { name: 'CDCs / Upgrade', type: 'Education' },
+                    { name: 'ALS (Airman Leadership School)', type: 'PME' }
+                ]
+            },
+            {
+                id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'shield',
+                focus: 'Mission Accomplishment',
+                desc: 'Expert hands-on technicians and first-line supervisors. Ensuring team members work together to accomplish the mission.',
+                steps: [
+                    { name: '7-Level Upgrade', type: 'Training' },
+                    { name: 'NCOA', type: 'PME' },
+                    { name: 'CCAF Degree', type: 'Education' },
+                    { name: 'Supervisor Safety Course', type: 'Training' }
+                ]
+            },
+            {
+                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'award',
+                focus: 'Strategic Leadership',
+                desc: 'Serving as leaders in the profession of arms. Advising, supervising, and mentoring to develop junior officers and enlisted Airmen.',
+                steps: [
+                    { name: 'SNCOA', type: 'PME' },
+                    { name: 'SEJPME I & II', type: 'Joint PME' },
+                    { name: 'Superintendent Course', type: 'Training' },
+                    { name: 'Strategic Placements', type: 'Experience' }
+                ]
+            }
+        ];
+
+        const OFFICER_TIERS = [
+            {
+                id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'user',
+                focus: 'Tactical Competence',
+                desc: 'Focus on learning the Air Force, leading flights, and mastering AFSC duties.',
+                steps: [
+                    { name: 'Officer Training', type: 'Accession' },
+                    { name: 'Tech School / Upgrade', type: 'Training' },
+                    { name: 'SOS (Squadron Officer School)', type: 'PME' }
+                ]
+            },
+            {
+                id: 'fgo', title: 'Field Grade', ranks: 'Maj - Lt Col', icon: 'shield',
+                focus: 'Operational Competence',
+                desc: 'Focus on Squadron command, joint operations, and operational planning.',
+                steps: [
+                    { name: 'ACSC (Air Command & Staff College)', type: 'PME' },
+                    { name: 'Masters Degree', type: 'Education' },
+                    { name: 'Joint PME Phase I', type: 'PME' }
+                ]
+            },
+            {
+                id: 'so', title: 'Senior Officer', ranks: 'Col', icon: 'award',
+                focus: 'Strategic Vision',
+                desc: 'Focus on Group/Wing command, strategic planning, and joint integration.',
+                steps: [
+                    { name: 'AWC (Air War College)', type: 'PME' },
+                    { name: 'Joint PME Phase II', type: 'PME' },
+                    { name: 'Strategic Planning Seminar', type: 'Training' }
+                ]
+            }
+        ];
+
+        // --- BLUE BOOK DATA ---
+        const BLUE_BOOK_CONTENT = {
+            oath: {
+                title: "The Oath of Enlistment",
+                text: "I do solemnly swear (or affirm) that I will support and defend the Constitution of the United States against all enemies, foreign and domestic; that I will bear true faith and allegiance to the same; and that I will obey the orders of the President of the United States and the orders of the officers appointed over me, according to regulations and the Uniform Code of Military Justice. So help me God.",
+                breakdown: [
+                    { phrase: "Support and Defend", meaning: "We swear allegiance not to a person, but to the Constitution—the ideals of liberty and law." },
+                    { phrase: "Bear True Faith", meaning: "This promise demands fidelity, loyalty, and trust in the system and our fellow Airmen." },
+                    { phrase: "Obey the Orders", meaning: "The foundation of military discipline. We act not on impulse, but on lawful orders to execute the mission." }
+                ]
+            },
+            conduct: {
+                title: "Code of Conduct",
+                desc: "The ethical guide for members of the United States Armed Forces in time of war and peace.",
+                articles: [
+                    { id: "I", text: "I am an American, fighting in the forces which guard my country and our way of life. I am prepared to give my life in their defense." },
+                    { id: "II", text: "I will never surrender of my own free will. If in command, I will never surrender the members of my command while they still have the means to resist." },
+                    { id: "III", text: "If I am captured I will continue to resist by all means available. I will make every effort to escape and aid others to escape. I will accept neither parole nor special favors from the enemy." },
+                    { id: "IV", text: "If I become a prisoner of war, I will keep faith with my fellow prisoners. I will give no information or take part in any action which might be harmful to my comrades. If I am senior, I will take command. If not, I will obey the lawful orders of those appointed over me and will back them up in every way." },
+                    { id: "V", text: "When questioned, should I become a prisoner of war, I am required to give name, rank, service number and date of birth. I will evade answering further questions to the utmost of my ability. I will make no oral or written statements disloyal to my country and its allies or harmful to their cause." },
+                    { id: "VI", text: "I will never forget that I am an American, fighting for freedom, responsible for my actions, and dedicated to the principles which made my country free. I will trust in my God and in the United States of America." }
+                ]
+            },
+            creed: "I am an American Airman. I am a Warrior. I have answered my Nation's call. I am an American Airman. My mission is to Fly, Fight, and Win. I am faithful to a Proud Heritage, A Tradition of Honor, And a Legacy of Valor. I am an American Airman. Guardian of Freedom and Justice, My Nation's Sword and Shield, Its Sentry and Avenger. I defend my Country with my Life.",
+            profession: {
+                title: "The Profession of Arms",
+                desc: "We are not employees; we are members of a profession. This distinction changes everything about how we act, think, and serve.",
+                points: [
+                    { title: "Expertise", text: "We must be experts in the application of lethal force and the technology of airpower." },
+                    { title: "Responsibility", text: "We are entrusted by the American people with the security of the nation and the lives of its sons and daughters." },
+                    { title: "Corporateness", text: "We share a unique identity, culture, and bond that separates us from civilian society." }
+                ]
+            },
+            airmanship: {
+                title: "Airmanship",
+                desc: "Airmanship is not just a job; it is a mindset. It is the relentless pursuit of excellence and the commitment to the Air Force family.",
+                points: [
+                    { title: "The Mindset", text: "A certainty that you are part of something larger than yourself. A commitment to the Core Values 24/7." },
+                    { title: "We Are All Recruiters", text: "Every Airman is an ambassador. Your conduct in and out of uniform shapes the public's trust." },
+                    { title: "Warrior Ethos", text: "A refusal to accept failure. A willingness to push beyond perceived limits for the mission." }
+                ]
+            },
+            values: [
+                {
+                    title: 'Integrity First',
+                    desc: 'The moral compass that guides us when no one is looking.',
+                    virtues: [
+                        { name: 'Honesty', def: 'Truthfulness in our words and actions. The foundation of trust.' },
+                        { name: 'Courage', def: 'Doing what is right despite fear or personal cost.' },
+                        { name: 'Accountability', def: 'Taking ownership of the outcomes of our decisions.' }
+                    ]
+                },
+                {
+                    title: 'Service Before Self',
+                    desc: 'Professional duties take precedence over personal desires.',
+                    virtues: [
+                        { name: 'Duty', def: 'Obligation to perform what is required for the mission.' },
+                        { name: 'Loyalty', def: 'Internal commitment to the success of the unit and the nation.' },
+                        { name: 'Respect', def: 'Treating others with dignity and valuing diversity as a strength.' }
+                    ]
+                },
+                {
+                    title: 'Excellence In All We Do',
+                    desc: 'A sustained passion for continuous improvement.',
+                    virtues: [
+                        { name: 'Mission', def: 'Operational, product, and resource excellence. Doing the job right.' },
+                        { name: 'Discipline', def: 'A personal commitment to the highest standards of conduct.' },
+                        { name: 'Teamwork', def: 'Interdependency. We fight and win as a team, not as individuals.' }
+                    ]
+                }
+            ]
+        };
+
+        const BLUE_BOOK_SCENARIOS = [
+            {
+                question: "You notice a safety violation on the flightline. Fixing it will delay the mission launch, and leadership is pressuring for an on-time takeoff.",
+                options: [
+                    { text: "Ignore it. The mission priority outweighs a minor safety check.", feedback: "Incorrect. 'Excellence in All We Do' demands discipline and safety standards never be compromised.", correct: false },
+                    { text: "Report it immediately, regardless of the delay.", feedback: "Correct. 'Integrity First' means having the courage to do what is right, even when it is difficult or unpopular.", correct: true },
+                    { text: "Wait until after the launch to mention it for next time.", feedback: "Incorrect. This violates the trust placed in us to safeguard resources and lives.", correct: false }
+                ]
+            },
+            {
+                question: "A fellow Airman is struggling with a personal issue that is affecting their work. You have your own deadlines to meet.",
+                options: [
+                    { text: "Focus on your own work. Their personal life is not your business.", feedback: "Incorrect. 'Service Before Self' includes loyalty to the well-being of our team members.", correct: false },
+                    { text: "Report them to the supervisor for poor performance.", feedback: "Incorrect. This lacks the 'Respect' and 'Teamwork' required of a wingman.", correct: false },
+                    { text: "Stop and check on them. Offer support or guide them to resources.", feedback: "Correct. Airmanship means taking care of the Air Force family. Mission success depends on our people.", correct: true }
+                ]
+            }
+        ];
+
+        // --- MAIN APP COMPONENT ---
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('home');
+            const [mobileOpen, setMobileOpen] = useState(false);
+
+            useEffect(() => window.scrollTo(0,0), [activeTab]);
+
+            const navItems = [
+                { id: 'home', label: 'Home' },
+                { id: 'enlisted', label: 'Enlisted' },
+                { id: 'officer', label: 'Officer' },
+                { id: 'strategy', label: 'Strategic Docs' },
+                { id: 'cfdc', label: 'CFDC' },
+                { id: 'resources', label: 'Resources' },
+            ];
+
+            return (
+                <div className="flex flex-col min-h-screen font-sans text-slate-800">
+                    
+                    {/* --- HEADER --- */}
+                    <header className="bg-[#00308F] text-white shadow-lg sticky top-0 z-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center h-20">
+                                <div className="flex items-center space-x-4 cursor-pointer group" onClick={() => setActiveTab('home')}>
+                                    <div className="bg-white p-1 rounded-lg overflow-hidden h-12 w-12 flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                                        <img src={IMAGES.logo} alt="CA ANG Logo" className="h-full w-full object-contain" onError={(e) => {e.target.onerror = null; e.target.style.display='none'; e.target.parentNode.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00308F" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'}} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <h1 className="font-bold text-xl leading-none tracking-wide">CA ANG</h1>
+                                        <p className="text-[11px] text-blue-200 uppercase font-bold tracking-[0.15em] mt-1">Force Development</p>
+                                    </div>
+                                </div>
+
+                                <nav className="hidden md:flex space-x-2">
+                                    {navItems.map(item => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setActiveTab(item.id)}
+                                            className={`px-4 py-2 rounded-md text-sm font-bold transition-all duration-200
+                                                ${activeTab === item.id 
+                                                    ? 'bg-white text-[#00308F] shadow-sm' 
+                                                    : 'text-blue-100 hover:bg-blue-800 hover:text-white hover:shadow-inner'}`}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </nav>
+
+                                <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white p-2 hover:bg-blue-800 rounded">
+                                    <Icon name={mobileOpen ? "x" : "menu"} size={28} />
+                                </button>
+                            </div>
+                        </div>
+
+                        {mobileOpen && (
+                            <div className="md:hidden bg-[#002060] border-t border-blue-800 animate-enter">
+                                {navItems.map(item => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => { setActiveTab(item.id); setMobileOpen(false); }}
+                                        className="block w-full text-left px-6 py-4 text-white hover:bg-[#00308F] font-medium border-b border-blue-800/50 last:border-0"
+                                    >
+                                        {item.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </header>
+
+                    {/* --- MAIN CONTENT --- */}
+                    <main className="flex-grow w-full max-w-7xl mx-auto p-4 md:p-8">
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 min-h-[600px] p-6 md:p-10 animate-enter">
+                            {activeTab === 'home' && <HomeView setActiveTab={setActiveTab} />}
+                            {activeTab === 'enlisted' && <EnlistedView />}
+                            {activeTab === 'officer' && <CareerRoadmapView data={OFFICER_TIERS} title="Officer Development" />}
+                            {activeTab === 'strategy' && <StrategyView />}
+                            {activeTab === 'cfdc' && <SimpleListView title="CFDC & Councils" />}
+                            {activeTab === 'resources' && <ResourceView />}
+                        </div>
+                    </main>
+
+                    {/* --- FOOTER --- */}
+                    <footer className="bg-slate-800 text-slate-400 py-12 border-t-4 border-[#00308F] mt-auto">
+                        <div className="max-w-7xl mx-auto px-4 text-center">
+                            <div className="mb-6 flex justify-center items-center space-x-2">
+                                <Icon name="shield" size={24} className="text-slate-500" />
+                                <span className="font-bold text-slate-300 tracking-wide uppercase">California Air National Guard</span>
+                            </div>
+                            <p className="text-sm mb-6">Force Development • Education • Training • Leadership</p>
+                            <div className="flex flex-wrap justify-center gap-6 text-xs uppercase tracking-widest font-bold">
+                                <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                                <a href="#" className="hover:text-white transition-colors">Accessibility</a>
+                                <a href="#" className="hover:text-white transition-colors">Webmaster</a>
+                            </div>
+                            <p className="text-[10px] text-slate-600 mt-8">
+                                NOT AN OFFICIAL U.S. GOVERNMENT WEBSITE. FOR INFORMATIONAL PURPOSES ONLY.
+                            </p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+
+        // --- PAGE VIEWS ---
+
+        function HomeView({ setActiveTab }) {
+            return (
+                <div className="space-y-16 animate-enter">
+                    {/* Hero */}
+                    <div className="text-center border-b border-gray-100 pb-12">
+                        <div className="inline-flex items-center bg-blue-50 text-[#00308F] px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide mb-4 border border-blue-100">
+                            <Icon name="zap" size={12} className="mr-2"/> Readiness • Lethality • Partnership
+                        </div>
+                        <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
+                            Force Development Hub
+                        </h2>
+                        <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                            The central resource for California Air National Guard professional military education, career progression, and strategic development.
+                        </p>
+                        
+                        <div className="flex flex-wrap justify-center gap-4 mt-10">
+                            <button onClick={() => setActiveTab('enlisted')} className="bg-[#00308F] text-white px-8 py-4 rounded-lg font-bold shadow-lg shadow-blue-900/20 hover:bg-blue-800 hover:-translate-y-1 transition-all flex items-center">
+                                <Icon name="users" className="mr-2"/> ENLISTED PATH
+                            </button>
+                            <button onClick={() => setActiveTab('officer')} className="bg-white text-[#00308F] border-2 border-[#00308F] px-8 py-4 rounded-lg font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center">
+                                <Icon name="award" className="mr-2"/> OFFICER PATH
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Unit Patches */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] mb-8 text-center border-b border-gray-100 leading-[0.1em]">
+                            <span className="bg-white px-4">California Wings & Units</span>
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+                            {UNITS.map((unit, i) => (
+                                <a key={i} href={unit.link} target="_blank" className="flex flex-col items-center group patch-hover cursor-pointer">
+                                    <div className="w-28 h-28 mb-4 bg-gray-50 rounded-full flex items-center justify-center p-3 shadow-sm border border-gray-100 overflow-hidden relative">
+                                        <div className="absolute inset-0 bg-blue-900 opacity-0 group-hover:opacity-5 transition-opacity rounded-full"></div>
+                                        <img 
+                                            src={unit.image} 
+                                            alt={unit.name} 
+                                            className="max-w-full max-h-full object-contain drop-shadow-sm"
+                                            onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('bg-slate-200');}}
+                                        />
+                                        <Icon name="shield" size={32} className="text-slate-300 absolute opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                    <span className="font-bold text-slate-700 text-sm group-hover:text-[#00308F] text-center transition-colors">{unit.name}</span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Content Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8 border-t border-gray-100">
+                        {/* Leadership */}
+                        <div className="lg:col-span-4 bg-slate-50/80 rounded-2xl p-6 border border-slate-200">
+                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
+                                <Icon name="star" className="mr-2 text-yellow-600 fill-current" /> Leadership
+                            </h3>
+                            <div className="space-y-8">
+                                {LEADERSHIP.map((leader, i) => (
+                                    <div key={i} className="flex flex-row lg:flex-col items-center lg:text-center text-left gap-4">
+                                        <div className="w-24 h-24 lg:w-32 lg:h-32 bg-white rounded-xl overflow-hidden shadow-sm border-4 border-white flex-shrink-0">
+                                            <img src={leader.image} alt={leader.name} className="w-full h-full object-cover" onError={(e) => e.target.src='https://via.placeholder.com/150?text=Leader'} />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-900 text-sm leading-tight mb-1">{leader.name}</h4>
+                                            <p className="text-xs text-[#00308F] font-bold uppercase tracking-wide mb-2">{leader.title}</p>
+                                            <a href={leader.link} target="_blank" className="text-xs font-bold text-slate-500 hover:text-[#00308F] hover:underline inline-flex items-center">
+                                                Biography <Icon name="external-link" size={10} className="ml-1"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Announcements */}
+                        <div className="lg:col-span-8 flex flex-col gap-8">
+                            <div>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-bold text-slate-900 flex items-center">
+                                        <Icon name="bell" className="mr-2 text-[#00308F]" /> News & Updates
+                                    </h3>
+                                    <button className="text-xs font-bold text-blue-600 hover:underline">View Archive</button>
+                                </div>
+                                <div className="space-y-3">
+                                    {ANNOUNCEMENTS.map(item => (
+                                        <div key={item.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                                            <div>
+                                                <div className="flex items-center space-x-3 mb-1">
+                                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide 
+                                                        ${item.type === 'Training' ? 'bg-blue-100 text-blue-800' : 
+                                                          item.type === 'Strategic' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                        {item.type}
+                                                    </span>
+                                                    <span className="text-xs text-slate-400 flex items-center">
+                                                        <Icon name="clock" size={10} className="mr-1"/> {item.date}
+                                                    </span>
+                                                </div>
+                                                <h4 className="font-bold text-slate-800 group-hover:text-[#00308F] transition-colors">{item.title}</h4>
+                                            </div>
+                                            <a href={item.link} className="text-sm font-bold text-slate-400 group-hover:text-[#00308F] flex items-center transition-colors">
+                                                Open <Icon name="chevron-right" size={14} className="ml-1"/>
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Quick Links */}
+                            <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <h3 className="text-lg font-bold text-white mb-4">Strategic & Development Quick Links</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <button onClick={() => setActiveTab('strategy')} className="flex items-center p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg transition-colors text-sm font-medium">
+                                            <Icon name="globe" size={16} className="mr-3 text-yellow-400"/> Great Power Competition
+                                        </button>
+                                        <button onClick={() => setActiveTab('cfdc')} className="flex items-center p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg transition-colors text-sm font-medium">
+                                            <Icon name="target" size={16} className="mr-3 text-green-400"/> Development Opportunities
+                                        </button>
+                                        <a href="#" className="flex items-center p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg transition-colors text-sm font-medium">
+                                            <Icon name="calendar" size={16} className="mr-3 text-blue-400"/> Development Calendar
+                                        </a>
+                                        <button onClick={() => setActiveTab('resources')} className="flex items-center p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg transition-colors text-sm font-medium">
+                                            <Icon name="file-text" size={16} className="mr-3 text-purple-400"/> Forms & Regulations
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="absolute right-0 top-0 p-4 opacity-10">
+                                    <Icon name="shield" size={150} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- INTERACTIVE BLUE BOOK COMPONENT ---
+        function BlueBookInteractive({ onBack }) {
+            const [mode, setMode] = useState('menu'); // menu, explore, challenge, profession, airmanship, conduct
+            const [activeVal, setActiveVal] = useState(0);
+            const [challengeIdx, setChallengeIdx] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+
+            // Menu View
+            if (mode === 'menu') {
+                return (
+                    <div className="animate-enter">
+                        <button onClick={onBack} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Back to Enlisted
+                        </button>
+                        
+                        <div className="bg-[#00308F] text-white rounded-2xl p-10 text-center mb-8 shadow-xl relative overflow-hidden">
+                            <div className="relative z-10">
+                                <h2 className="text-4xl font-extrabold mb-2">The Blue Book</h2>
+                                <p className="text-blue-200 text-lg">The Profession of Arms: Our Core Values</p>
+                            </div>
+                            <div className="absolute top-0 right-0 p-8 opacity-10"><Icon name="book-open" size={80} /></div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div onClick={() => setMode('profession')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
+                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="award" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Profession of Arms</h3>
+                                <p className="text-slate-500">More than a job. The responsibility and expertise of our service.</p>
+                            </div>
+                            <div onClick={() => setMode('airmanship')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
+                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="plane" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Airmanship</h3>
+                                <p className="text-slate-500">The mindset, the oath, and the creed of an American Airman.</p>
+                            </div>
+                            <div onClick={() => setMode('explore')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
+                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="book-open" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Core Values</h3>
+                                <p className="text-slate-500">Deep dive into Integrity, Service, and Excellence.</p>
+                            </div>
+                            <div onClick={() => setMode('conduct')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
+                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="flag" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Code of Conduct</h3>
+                                <p className="text-slate-500">Ethical guide for members of the Armed Forces.</p>
+                            </div>
+                            <div onClick={() => setMode('challenge')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group md:col-span-2 lg:col-span-1">
+                                <div className="bg-yellow-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-yellow-600 group-hover:scale-110 transition-transform">
+                                    <Icon name="shield" size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-2">Guardian Challenge</h3>
+                                <p className="text-slate-500">Test your ethical decision-making in real scenarios.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Profession Mode
+            if (mode === 'profession') {
+                return (
+                    <div className="animate-enter">
+                        <button onClick={() => setMode('menu')} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Back to Menu
+                        </button>
+                        <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4">{BLUE_BOOK_CONTENT.profession.title}</h2>
+                            <p className="text-lg text-slate-600 mb-8 max-w-3xl">{BLUE_BOOK_CONTENT.profession.desc}</p>
+                            <div className="grid md:grid-cols-3 gap-6">
+                                {BLUE_BOOK_CONTENT.profession.points.map((pt, i) => (
+                                    <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                        <h4 className="text-[#00308F] font-bold text-lg mb-2">{pt.title}</h4>
+                                        <p className="text-slate-600 leading-relaxed">{pt.text}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Airmanship Mode
+            if (mode === 'airmanship') {
+                return (
+                    <div className="animate-enter">
+                        <button onClick={() => setMode('menu')} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Back to Menu
+                        </button>
+                        <div className="space-y-8">
+                            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                                <h2 className="text-3xl font-bold text-slate-900 mb-4">{BLUE_BOOK_CONTENT.airmanship.title}</h2>
+                                <p className="text-lg text-slate-600 mb-8 max-w-3xl">{BLUE_BOOK_CONTENT.airmanship.desc}</p>
+                                <div className="grid md:grid-cols-3 gap-6">
+                                    {BLUE_BOOK_CONTENT.airmanship.points.map((pt, i) => (
+                                        <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                            <h4 className="text-[#00308F] font-bold text-lg mb-2">{pt.title}</h4>
+                                            <p className="text-slate-600 leading-relaxed">{pt.text}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
+                                    <h3 className="font-bold text-xl text-slate-900 mb-4">Oath of Enlistment</h3>
+                                    <p className="font-serif italic text-slate-600 mb-6">"{BLUE_BOOK_CONTENT.oath.text}"</p>
+                                    <div className="space-y-3">
+                                        {BLUE_BOOK_CONTENT.oath.breakdown.map((item, i) => (
+                                            <div key={i} className="text-sm p-3 bg-slate-50 rounded">
+                                                <span className="font-bold text-[#00308F]">{item.phrase}:</span> {item.meaning}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-slate-900 p-8 rounded-xl shadow-sm text-slate-300">
+                                    <h3 className="font-bold text-xl text-white mb-4">The Airman's Creed</h3>
+                                    <p className="font-serif italic leading-loose text-lg">"{BLUE_BOOK_CONTENT.creed}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Conduct Mode
+            if (mode === 'conduct') {
+                return (
+                    <div className="animate-enter">
+                        <button onClick={() => setMode('menu')} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Back to Menu
+                        </button>
+                        <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                            <h2 className="text-3xl font-bold text-slate-900 mb-4">{BLUE_BOOK_CONTENT.conduct.title}</h2>
+                            <p className="text-lg text-slate-600 mb-8 max-w-3xl">{BLUE_BOOK_CONTENT.conduct.desc}</p>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {BLUE_BOOK_CONTENT.conduct.articles.map((article, i) => (
+                                    <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                        <h4 className="text-[#00308F] font-bold text-lg mb-2">Article {article.id}</h4>
+                                        <p className="text-slate-600 leading-relaxed font-serif">{article.text}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Explore Mode
+            if (mode === 'explore') {
+                return (
+                    <div className="animate-enter">
+                        <button onClick={() => setMode('menu')} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Back to Menu
+                        </button>
+                        
+                        <div className="grid lg:grid-cols-3 gap-6 mb-8">
+                            {BLUE_BOOK_CONTENT.values.map((val, i) => (
+                                <div 
+                                    key={i}
+                                    onClick={() => setActiveVal(i)}
+                                    className={`cursor-pointer rounded-xl p-6 border-2 transition-all duration-300 ${activeVal === i ? 'border-[#00308F] bg-blue-50 shadow-md scale-105' : 'border-slate-200 bg-white hover:border-blue-300'}`}
+                                >
+                                    <h3 className={`text-xl font-bold mb-2 ${activeVal === i ? 'text-[#00308F]' : 'text-slate-800'}`}>{val.title}</h3>
+                                    <p className="text-sm text-slate-500">{val.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 animate-enter">
+                            <div className="flex items-start mb-8 border-b border-gray-100 pb-6">
+                                <div className="bg-[#00308F] text-white p-3 rounded-full mr-4"><Icon name="star" size={24}/></div>
+                                <div>
+                                    <h3 className="text-2xl font-bold text-slate-900">{BLUE_BOOK_CONTENT.values[activeVal].title}</h3>
+                                    <p className="text-slate-600 mt-2 text-lg">The foundation of our service.</p>
+                                </div>
+                            </div>
+                            <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Virtues in Action</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                {BLUE_BOOK_CONTENT.values[activeVal].virtues.map((v, idx) => (
+                                    <div key={idx} className="bg-slate-50 p-5 rounded-xl border border-slate-100 hover:shadow-md transition-shadow">
+                                        <div className="text-[#00308F] font-bold text-lg mb-2">{v.name}</div>
+                                        <p className="text-sm text-slate-600 leading-relaxed">{v.def}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Challenge Mode
+            if (mode === 'challenge') {
+                const scenario = BLUE_BOOK_SCENARIOS[challengeIdx];
+                return (
+                    <div className="animate-enter max-w-3xl mx-auto">
+                        <button onClick={() => { setMode('menu'); setChallengeIdx(0); setFeedback(null); }} className="flex items-center text-slate-500 hover:text-[#00308F] font-bold mb-6 transition-colors">
+                            <Icon name="arrow-left" className="mr-2"/> Exit Challenge
+                        </button>
+
+                        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                            <div className="bg-slate-900 p-6 text-white flex justify-between items-center">
+                                <h3 className="font-bold text-lg">Scenario {challengeIdx + 1} of {BLUE_BOOK_SCENARIOS.length}</h3>
+                                <Icon name="shield" className="text-yellow-400" />
+                            </div>
+                            <div className="p-8">
+                                <p className="text-xl text-slate-800 font-medium mb-8 leading-relaxed">
+                                    {scenario.question}
+                                </p>
+
+                                <div className="space-y-4">
+                                    {scenario.options.map((opt, i) => (
+                                        <button 
+                                            key={i}
+                                            disabled={feedback !== null}
+                                            onClick={() => setFeedback(opt)}
+                                            className={`w-full text-left p-4 rounded-xl border-2 transition-all font-medium
+                                                ${feedback === opt 
+                                                    ? (opt.correct ? 'border-green-500 bg-green-50 text-green-900' : 'border-red-500 bg-red-50 text-red-900')
+                                                    : 'border-slate-100 hover:border-blue-300 hover:bg-blue-50 text-slate-700'
+                                                }`}
+                                        >
+                                            {opt.text}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {feedback && (
+                                    <div className="mt-8 animate-enter">
+                                        <div className={`p-4 rounded-lg mb-6 flex items-start ${feedback.correct ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            <Icon name={feedback.correct ? "check-circle" : "x-circle"} className="mr-3 mt-1 flex-shrink-0" />
+                                            <p>{feedback.feedback}</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                if (challengeIdx < BLUE_BOOK_SCENARIOS.length - 1) {
+                                                    setChallengeIdx(challengeIdx + 1);
+                                                    setFeedback(null);
+                                                } else {
+                                                    alert("Challenge Complete! Integrity first.");
+                                                    setMode('menu');
+                                                    setChallengeIdx(0);
+                                                    setFeedback(null);
+                                                }
+                                            }}
+                                            className="w-full bg-[#00308F] text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition-colors"
+                                        >
+                                            {challengeIdx < BLUE_BOOK_SCENARIOS.length - 1 ? "Next Scenario" : "Finish Challenge"}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        // --- ENLISTED VIEW REDESIGN ---
+        function EnlistedView() {
+            const [expandedTier, setExpandedTier] = useState(null);
+            const [showBlueBook, setShowBlueBook] = useState(false);
+
+            if (showBlueBook) {
+                return <BlueBookInteractive onBack={() => setShowBlueBook(false)} />;
+            }
+
+            return (
+                <div className="space-y-12 animate-enter">
+                    {/* Header */}
+                    <div className="text-center border-b border-gray-100 pb-10">
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#00308F] mb-4">Enlisted Force Development</h2>
+                        <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+                            The backbone of the Air Force. Explore the requirements, education, and leadership milestones for every stage of your career.
+                        </p>
+                    </div>
+
+                    {/* The Big Three Library */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Interactive Blue Book Card */}
+                        <div onClick={() => setShowBlueBook(true)} className="group flex flex-col items-center cursor-pointer">
+                            <div className="relative w-40 h-56 mb-4 rounded-lg shadow-xl overflow-hidden transform group-hover:-translate-y-2 transition-all duration-300 ring-4 ring-transparent group-hover:ring-[#00308F]/20">
+                                <img src={IMAGES.blueBook} alt="Blue Book" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                    <span className="bg-[#00308F] text-white text-xs font-bold px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">Launch Interactive</span>
+                                </div>
+                            </div>
+                            <h3 className="font-bold text-lg text-slate-800 group-hover:text-[#00308F] transition-colors">The Blue Book</h3>
+                            <p className="text-sm text-slate-500">Our Core Values</p>
+                        </div>
+
+                        {/* Standard Links for Others */}
+                        {[
+                            { name: 'The Brown Book', sub: 'Enlisted Structure', img: IMAGES.brownBook, link: 'https://www.doctrine.af.mil/Portals/61/documents/Airman_Development/BrownBook.pdf' },
+                            { name: 'The Blueprint', sub: 'Roadmap to Dev', img: IMAGES.blueprint, link: 'https://www.af.mil/Portals/1/documents/ul/EFD-The_Blueprint.pdf' }
+                        ].map((book, i) => (
+                            <a key={i} href={book.link} target="_blank" className="group flex flex-col items-center">
+                                <div className="relative w-40 h-56 mb-4 rounded-lg shadow-xl overflow-hidden transform group-hover:-translate-y-2 transition-all duration-300">
+                                    <img src={book.img} alt={book.name} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors"></div>
+                                </div>
+                                <h3 className="font-bold text-lg text-slate-800 group-hover:text-[#00308F] transition-colors">{book.name}</h3>
+                                <p className="text-sm text-slate-500">{book.sub}</p>
+                            </a>
+                        ))}
+                    </div>
+
+                    {/* Interactive Roadmap */}
+                    <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
+                        <h3 className="text-xl font-bold text-slate-900 mb-8 flex items-center">
+                            <Icon name="map" className="mr-3 text-[#00308F]"/> Interactive Career Roadmap
+                        </h3>
+                        <div className="relative pl-4 ml-2 timeline-line">
+                            {ENLISTED_TIERS.map((tier, i) => (
+                                <div key={i} className={`relative pl-8 pb-8 ${i === ENLISTED_TIERS.length - 1 ? 'last-item' : ''}`}>
+                                    <div className="timeline-connector"></div>
+                                    
+                                    {/* Interactive Node */}
+                                    <div 
+                                        onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                        className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 shadow-md z-10 cursor-pointer transition-all hover:scale-110
+                                            ${expandedTier === i ? 'bg-[#00308F] border-blue-100 text-white' : 'bg-white border-slate-200 text-slate-400'}`}
+                                    >
+                                        <Icon name={tier.icon} size={20} />
+                                    </div>
+
+                                    {/* Card */}
+                                    <div 
+                                        onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                        className={`cursor-pointer rounded-xl border transition-all duration-300 overflow-hidden bg-white
+                                            ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-blue-100' : 'border-slate-200 shadow-sm hover:border-blue-300'}`}
+                                    >
+                                        <div className="p-6 flex justify-between items-center">
+                                            <div>
+                                                <h4 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>{tier.title}</h4>
+                                                <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">{tier.ranks}</p>
+                                            </div>
+                                            <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="text-slate-400" />
+                                        </div>
+
+                                        {expandedTier === i && (
+                                            <div className="px-6 pb-6 bg-slate-50 border-t border-slate-100 animate-enter">
+                                                <p className="text-slate-600 mb-6 italic border-l-4 border-blue-200 pl-4 py-1">{tier.desc}</p>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    {tier.steps.map((step, j) => (
+                                                        <div key={j} className="flex items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                                                            <div className="bg-blue-50 p-2 rounded-full mr-3 text-[#00308F]">
+                                                                <Icon name="check-circle" size={14} />
+                                                            </div>
+                                                            <div>
+                                                                <span className="text-[10px] font-bold text-slate-400 uppercase block">{step.type}</span>
+                                                                <span className="text-sm font-bold text-slate-700">{step.name}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <a href="https://sites.google.com/view/efacmeetinginfo/home" target="_blank" className="flex items-center p-6 bg-blue-900 rounded-xl text-white shadow-lg hover:bg-blue-800 transition-colors group">
+                            <div className="bg-white/10 p-3 rounded-full mr-4 group-hover:scale-110 transition-transform">
+                                <Icon name="users" size={24} />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-lg">Enlisted Field Advisory Council</h4>
+                                <p className="text-blue-200 text-sm">EFAC Meeting Info & Updates</p>
+                            </div>
+                            <Icon name="external-link" className="ml-auto opacity-50 group-hover:opacity-100" />
+                        </a>
+                        
+                        <div className="flex items-center p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+                            <div className="bg-slate-100 p-3 rounded-full mr-4 text-slate-500">
+                                <Icon name="book-open" size={24} />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-800">Development Resources</h4>
+                                <div className="flex space-x-4 mt-1 text-sm text-[#00308F] font-bold">
+                                    <button onClick={() => alert('Navigate to Reading List')}>Reading List</button>
+                                    <button onClick={() => alert('Navigate to ALQs')}>ALQs</button>
+                                    <button onClick={() => alert('Navigate to Videos')}>Videos</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function CareerRoadmapView({ data, title }) {
+            const [expandedTier, setExpandedTier] = useState(null);
+
+            return (
+                <div className="animate-enter">
+                    <div className="border-b border-gray-200 pb-6 mb-8">
+                        <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
+                        <p className="text-slate-500 mt-2">Interactive Roadmap: Click on a tier to explore requirements.</p>
+                    </div>
+
+                    <div className="space-y-6">
+                        {data.map((tier, i) => (
+                            <div key={i} className="relative pl-12">
+                                <div className="timeline-connector"></div>
+                                
+                                {/* Node Icon */}
+                                <div className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-md z-10 transition-colors
+                                    ${expandedTier === i ? 'bg-[#00308F] text-white' : 'bg-white text-slate-400'}`}>
+                                    <Icon name={tier.icon} size={20} />
+                                </div>
+
+                                {/* Interactive Card */}
+                                <div 
+                                    onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                    className={`bg-white rounded-xl border transition-all cursor-pointer overflow-hidden
+                                        ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-[#00308F]/20' : 'border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md'}`}
+                                >
+                                    <div className="p-6 flex flex-col md:flex-row md:items-center justify-between">
+                                        <div>
+                                            <h3 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>
+                                                {tier.title}
+                                            </h3>
+                                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wide mt-1">{tier.ranks}</p>
+                                        </div>
+                                        <div className="mt-4 md:mt-0 flex items-center text-sm font-medium text-slate-500">
+                                            {expandedTier === i ? 'Collapse' : 'View Requirements'} 
+                                            <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="ml-2" />
+                                        </div>
+                                    </div>
+
+                                    {/* Expanded Content */}
+                                    {expandedTier === i && (
+                                        <div className="bg-slate-50 border-t border-slate-100 p-6 animate-enter">
+                                            <p className="text-slate-600 mb-6 italic">{tier.desc}</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                {tier.steps.map((step, j) => (
+                                                    <div key={j} className="bg-white p-4 rounded-lg border border-slate-200 flex items-center shadow-sm">
+                                                        <div className="p-2 bg-blue-50 rounded-full mr-3 text-[#00308F]">
+                                                            <Icon name="check-circle" size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs font-bold text-slate-400 uppercase">{step.type}</div>
+                                                            <div className="font-bold text-slate-800">{step.name}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function StrategyView() {
+            return (
+                <div className="animate-enter space-y-8">
+                    <div className="border-b border-gray-200 pb-6">
+                        <h2 className="text-3xl font-bold text-slate-900">Strategic & GPC</h2>
+                        <p className="text-slate-500 mt-2">Connecting tactical actions to strategic objectives.</p>
+                    </div>
+
+                    <div className="grid lg:grid-cols-2 gap-8">
+                        <div className="bg-[#1F2937] text-white p-8 rounded-xl shadow-lg relative overflow-hidden">
+                            <div className="relative z-10">
+                                <div className="flex items-center mb-6">
+                                    <Icon name="globe" size={28} className="text-yellow-400 mr-3"/>
+                                    <h3 className="text-2xl font-bold">Great Power Competition</h3>
+                                </div>
+                                <p className="text-slate-300 mb-8 leading-relaxed">
+                                    Understanding the capabilities and intent of peer competitors is essential for every Airman. Access unclassified briefings below.
+                                </p>
+                                <div className="flex gap-4">
+                                    <button className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-lg font-bold transition-colors">China Context</button>
+                                    <button className="bg-red-700 hover:bg-red-600 text-white px-5 py-2 rounded-lg font-bold transition-colors">Russia Context</button>
+                                </div>
+                            </div>
+                            <div className="absolute right-0 bottom-0 p-8 opacity-10"><Icon name="target" size={120} /></div>
+                        </div>
+
+                        <div className="grid gap-4">
+                            {['National Defense Strategy', 'National Military Strategy', 'Air Force Future Operating Concept', 'CA ANG Strategic Vision'].map((doc, i) => (
+                                <div key={i} className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg hover:border-[#00308F] hover:shadow-md cursor-pointer transition-all group">
+                                    <div className="flex items-center">
+                                        <div className="bg-slate-100 p-2 rounded mr-4 group-hover:bg-blue-50 transition-colors">
+                                            <Icon name="file-text" size={20} className="text-slate-500 group-hover:text-[#00308F]"/>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-slate-800 text-sm">{doc}</h4>
+                                            <span className="text-xs text-slate-500">PDF Document</span>
+                                        </div>
+                                    </div>
+                                    <Icon name="download" size={16} className="text-slate-300 group-hover:text-[#00308F]" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function CFDCView() {
+            return (
+                <div className="animate-enter space-y-8">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl font-bold text-slate-900">Programs & Councils</h2>
+                        <p className="text-slate-500 mt-2">Professional development opportunities and advisory boards.</p>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                            <div className="bg-[#00308F] p-6 text-white">
+                                <h3 className="text-xl font-bold flex items-center"><Icon name="target" className="mr-2"/> CFDC 300</h3>
+                                <p className="text-blue-200 text-sm mt-1">Advanced Development Course</p>
+                            </div>
+                            <div className="p-6 flex-grow flex flex-col">
+                                <p className="text-slate-600 mb-6">A premier course designed to broaden the perspective of mid-tier officers and enlisted leaders.</p>
+                                <button className="mt-auto w-full py-3 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200 transition-colors">View Dates & Register</button>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                            <div className="bg-slate-800 p-6 text-white">
+                                <h3 className="text-xl font-bold flex items-center"><Icon name="users" className="mr-2"/> Advisory Councils</h3>
+                                <p className="text-slate-400 text-sm mt-1">EAC, CGOC, & FDC</p>
+                            </div>
+                            <div className="p-6 flex-grow">
+                                <ul className="space-y-3 mb-6">
+                                    <li className="flex items-center text-slate-700"><Icon name="chevron-right" size={14} className="mr-2 text-blue-500"/> Enlisted Advisory Council</li>
+                                    <li className="flex items-center text-slate-700"><Icon name="chevron-right" size={14} className="mr-2 text-blue-500"/> Company Grade Officers</li>
+                                    <li className="flex items-center text-slate-700"><Icon name="chevron-right" size={14} className="mr-2 text-blue-500"/> Force Development Council</li>
+                                </ul>
+                                <button className="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded hover:bg-slate-200 transition-colors">View Charters</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ResourceView() {
+            const [searchTerm, setSearchTerm] = useState('');
+            const filtered = RESOURCES.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            return (
+                <div className="animate-enter space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-200 pb-6">
+                        <h2 className="text-3xl font-bold text-gray-900">Resource Library</h2>
+                        <div className="relative">
+                            <Icon name="search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Search documents..." 
+                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none w-full md:w-64"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filtered.map(res => (
+                            <a key={res.id} href={res.link} className="block p-5 bg-white border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-400 transition-all group">
+                                <h4 className="font-bold text-gray-800 group-hover:text-[#00308F] mb-2">{res.title}</h4>
+                                <p className="text-sm text-gray-600 mb-4">{res.description}</p>
+                                <span className="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded">{res.category}</span>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function SimpleListView({ title }) {
+            return (
+                <div className="text-center py-20 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                    <h3 className="text-xl font-bold text-gray-900">{title}</h3>
+                    <p className="text-gray-500 mt-2">Content section ready for population.</p>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
