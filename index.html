@@ -57,6 +57,17 @@
             z-index: 0;
         }
         .last-item .timeline-connector { display: none; }
+
+        /* Custom Scrollbar for inner content */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Progress Bar Animation */
+        .progress-bar-fill {
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -65,7 +76,142 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Icon Wrapper (Prevents Flickering) ---
+        // --- CUSTOM HOOK: PERSISTENT PROGRESS TRACKER ---
+        const useProgress = (storageKey) => {
+            const [progress, setProgress] = useState(() => {
+                try {
+                    const saved = localStorage.getItem(storageKey);
+                    return saved ? JSON.parse(saved) : {};
+                } catch (e) {
+                    console.error("Error loading progress", e);
+                    return {};
+                }
+            });
+
+            useEffect(() => {
+                localStorage.setItem(storageKey, JSON.stringify(progress));
+            }, [progress]);
+
+            const toggleItem = (id) => {
+                setProgress(prev => ({
+                    ...prev,
+                    [id]: !prev[id]
+                }));
+            };
+
+            const isComplete = (id) => !!progress[id];
+
+            // Calculate percentage for a given set of IDs
+            const getPercentage = (ids) => {
+                if (!ids || ids.length === 0) return 0;
+                const completedCount = ids.filter(id => progress[id]).length;
+                return Math.round((completedCount / ids.length) * 100);
+            };
+
+            return { progress, toggleItem, isComplete, getPercentage };
+        };
+
+        // --- PRINT / EXPORT FUNCTION ---
+        const printProgress = (title, tiers, progress) => {
+            const printWindow = window.open('', '_blank');
+            const date = new Date().toLocaleDateString();
+            
+            let content = `
+                <html>
+                <head>
+                    <title>${title} - Progress Report</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 40px; color: #1F2937; max-width: 800px; margin: 0 auto; }
+                        h1 { color: #00308F; border-bottom: 2px solid #00308F; padding-bottom: 10px; margin-bottom: 5px; }
+                        .meta { margin-bottom: 40px; color: #666; font-size: 0.9em; }
+                        .tier { margin-bottom: 30px; break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+                        .tier-header { background: #F3F4F6; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; }
+                        .tier-title { font-size: 1.1em; color: #111827; }
+                        .tier-score { background: #00308F; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; }
+                        .tier-body { padding: 15px; }
+                        .section-title { font-size: 0.8em; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 15px; margin-bottom: 8px; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+                        .item { display: flex; align-items: flex-start; margin: 8px 0; font-size: 0.95em; }
+                        .checkbox { 
+                            width: 16px; height: 16px; border: 1px solid #ccc; border-radius: 3px; margin-right: 12px; margin-top: 2px;
+                            display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
+                        }
+                        .checked { background: #00308F; border-color: #00308F; color: white; }
+                        .description { font-style: italic; color: #666; font-size: 0.9em; margin-bottom: 10px; }
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            button { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>${title} Report</h1>
+                    <div class="meta">Generated on ${date} • CA ANG Force Development</div>
+            `;
+
+            tiers.forEach(tier => {
+                const tierIds = [
+                    ...(tier.steps || []).map(s => `${tier.id}-${s.name}`),
+                    ...(tier.actionPlan || []).map(a => `${tier.id}-${a}`)
+                ];
+                
+                const completedCount = tierIds.filter(id => progress[id]).length;
+                const totalCount = tierIds.length;
+                const pct = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
+
+                content += `
+                    <div class="tier">
+                        <div class="tier-header">
+                            <span class="tier-title">${tier.title} <span style="font-weight:normal; font-size:0.9em; margin-left:5px;">(${tier.ranks})</span></span>
+                            <span class="tier-score">${pct}% Complete</span>
+                        </div>
+                        <div class="tier-body">
+                            <div class="description">${tier.desc}</div>
+                `;
+                
+                if (tier.steps && tier.steps.length > 0) {
+                     content += `<div class="section-title">Core Requirements</div>`;
+                     tier.steps.forEach(step => {
+                         const id = `${tier.id}-${step.name}`;
+                         const isDone = progress[id];
+                         content += `
+                            <div class="item">
+                                <span class="checkbox ${isDone ? 'checked' : ''}">${isDone ? '✓' : ''}</span>
+                                <span><strong>${step.name}</strong> <span style="color:#666; font-size:0.9em;">- ${step.type}</span></span>
+                            </div>
+                         `;
+                     });
+                }
+
+                if (tier.actionPlan && tier.actionPlan.length > 0) {
+                     content += `<div class="section-title">Action Plan</div>`;
+                     tier.actionPlan.forEach(action => {
+                         const id = `${tier.id}-${action}`;
+                         const isDone = progress[id];
+                         content += `
+                            <div class="item">
+                                <span class="checkbox ${isDone ? 'checked' : ''}">${isDone ? '✓' : ''}</span>
+                                <span>${action}</span>
+                            </div>
+                         `;
+                     });
+                }
+
+                content += `</div></div>`;
+            });
+
+            content += `
+                <script>
+                    window.onload = function() { window.print(); }
+                <\/script>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(content);
+            printWindow.document.close();
+        };
+
+        // --- Icon Wrapper ---
         const Icon = ({ name, size = 18, className = "" }) => {
             const iconRef = useRef(null);
             useEffect(() => {
@@ -80,9 +226,9 @@
             return <span ref={iconRef}><i data-lucide={name} className={className}></i></span>;
         };
 
-        // --- CONTENT & LINKS CONFIGURATION ---
+        // --- CONTENT CONFIGURATION ---
         
-        const IMAGES = {
+ const IMAGES = {
             logo: "https://lh3.googleusercontent.com/sitesv/AAzXCkeRj3L7Wr3A1GgT8aNuCBb8xNiFBCCaLGNhfPn2ih-sXeoKkZ-9Fr4YfTkjRknnXVUK1xL3-y_egSU4M8RX9xWXBuJ5vErlAnKpm5NcuBsUvrrFiQ3_mMtaTdTobvCPNzeGe8DQcya16NnKJXumWH3_ddj48fAijvI6alNwS6h-2wWYXVO3uVFnAlo=w16383",
             unit129: "129.svg",
             unit144: "144.svg",
@@ -139,35 +285,53 @@
             {
                 id: 'airman', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'user',
                 focus: 'Developing Technical Proficiency',
-                desc: 'Focus on adapting to military requirements, achieving occupational proficiency, and becoming a productive member of the Air Force.',
+                desc: 'Focus on adapting to military requirements, achieving occupational proficiency, and becoming a productive member of the Air Force. The primary goal is to learn the job and the Air Force culture.',
                 steps: [
                     { name: 'Basic Training', type: 'Entry' },
                     { name: 'Tech School', type: 'Training' },
                     { name: 'CDCs / Upgrade', type: 'Education' },
                     { name: 'ALS (Airman Leadership School)', type: 'PME' }
-                ]
+                ],
+                blueprintFocus: [
+                    { title: 'Warrior Ethos', text: 'Understand the profession of arms and the oath of enlistment.' },
+                    { title: 'Self-Control', text: 'Demonstrate emotional intelligence and discipline under stress.' },
+                    { title: 'Resilience', text: 'Develop physical, social, spiritual, and mental fitness.' }
+                ],
+                actionPlan: ['Complete Career Development Course (CDCs)', 'Find a Mentor (NCO)', 'Enroll in CCAF']
             },
             {
                 id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'shield',
                 focus: 'Mission Accomplishment',
-                desc: 'Expert hands-on technicians and first-line supervisors. Ensuring team members work together to accomplish the mission.',
+                desc: 'Expert hands-on technicians and first-line supervisors. NCOs ensure team members work together to accomplish the mission and are responsible for the development of those they supervise.',
                 steps: [
                     { name: '7-Level Upgrade', type: 'Training' },
                     { name: 'NCOA', type: 'PME' },
                     { name: 'CCAF Degree', type: 'Education' },
                     { name: 'Supervisor Safety Course', type: 'Training' }
-                ]
+                ],
+                blueprintFocus: [
+                    { title: 'Leadership', text: 'Transition from "doing" to "leading". Guide others to success.' },
+                    { title: 'Team Building', text: 'Foster an inclusive environment and build trust within the team.' },
+                    { title: 'Communication', text: 'Effectively translate strategic goals into tactical actions.' }
+                ],
+                actionPlan: ['Attend NCOA (In-Residence or Satellite)', 'Seek Opportunities to Lead Projects', 'Mentor Junior Airmen']
             },
             {
                 id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'award',
                 focus: 'Strategic Leadership',
-                desc: 'Serving as leaders in the profession of arms. Advising, supervising, and mentoring to develop junior officers and enlisted Airmen.',
+                desc: 'Serving as leaders in the profession of arms. Advising, supervising, and mentoring to develop junior officers and enlisted Airmen. They translate broad direction into specific execution.',
                 steps: [
                     { name: 'SNCOA', type: 'PME' },
                     { name: 'SEJPME I & II', type: 'Joint PME' },
                     { name: 'Superintendent Course', type: 'Training' },
                     { name: 'Strategic Placements', type: 'Experience' }
-                ]
+                ],
+                blueprintFocus: [
+                    { title: 'Strategic Vision', text: 'Understand the "Why" behind the mission and communicate it.' },
+                    { title: 'Organizational Mgmt', text: 'Manage resources, manpower, and unit culture effectively.' },
+                    { title: 'Joint Operations', text: 'Understand how the Air Force integrates with other branches.' }
+                ],
+                actionPlan: ['Complete SEJPME I/II', 'Attend SNCOA', 'Join a Council (EAC/FDC)']
             }
         ];
 
@@ -371,7 +535,7 @@
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 min-h-[600px] p-6 md:p-10 animate-enter">
                             {activeTab === 'home' && <HomeView setActiveTab={setActiveTab} />}
                             {activeTab === 'enlisted' && <EnlistedView />}
-                            {activeTab === 'officer' && <CareerRoadmapView data={OFFICER_TIERS} title="Officer Development" />}
+                            {activeTab === 'officer' && <CareerRoadmapView data={OFFICER_TIERS} title="Officer Development" trackerId="officer_progress" />}
                             {activeTab === 'strategy' && <StrategyView />}
                             {activeTab === 'cfdc' && <SimpleListView title="CFDC & Councils" />}
                             {activeTab === 'resources' && <ResourceView />}
@@ -591,7 +755,7 @@
                                 <p className="text-slate-500">Ethical guide for members of the Armed Forces.</p>
                             </div>
                             <div onClick={() => setMode('challenge')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group md:col-span-2 lg:col-span-1">
-                                <div className="bg-yellow-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-yellow-600 group-hover:scale-110 transition-transform">
+                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
                                     <Icon name="shield" size={32} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Guardian Challenge</h3>
@@ -802,8 +966,11 @@
 
         // --- ENLISTED VIEW REDESIGN ---
         function EnlistedView() {
-            const [expandedTier, setExpandedTier] = useState(null);
+            const [expandedTier, setExpandedTier] = useState(0); // Default to first item expanded
             const [showBlueBook, setShowBlueBook] = useState(false);
+            
+            // TRACKING HOOK INIT
+            const { toggleItem, isComplete, getPercentage, progress } = useProgress('ca_ang_enlisted_v1');
 
             if (showBlueBook) {
                 return <BlueBookInteractive onBack={() => setShowBlueBook(false)} />;
@@ -812,11 +979,19 @@
             return (
                 <div className="space-y-12 animate-enter">
                     {/* Header */}
-                    <div className="text-center border-b border-gray-100 pb-10">
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-[#00308F] mb-4">Enlisted Force Development</h2>
-                        <p className="text-lg text-slate-600 max-w-3xl mx-auto">
-                            The backbone of the Air Force. Explore the requirements, education, and leadership milestones for every stage of your career.
-                        </p>
+                    <div className="text-center border-b border-gray-100 pb-10 flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-[#00308F] mb-2">Enlisted Force Development</h2>
+                            <p className="text-lg text-slate-600 max-w-xl">
+                                The backbone of the Air Force. Explore the requirements, education, and leadership milestones for every stage of your career.
+                            </p>
+                        </div>
+                        <button 
+                            onClick={() => printProgress('Enlisted Career Roadmap', ENLISTED_TIERS, progress)}
+                            className="mt-4 md:mt-0 flex items-center bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-bold"
+                        >
+                            <Icon name="printer" className="mr-2" size={18}/> Export Progress
+                        </button>
                     </div>
 
                     {/* The Big Three Library */}
@@ -854,55 +1029,133 @@
                         <h3 className="text-xl font-bold text-slate-900 mb-8 flex items-center">
                             <Icon name="map" className="mr-3 text-[#00308F]"/> Interactive Career Roadmap
                         </h3>
+                        
                         <div className="relative pl-4 ml-2 timeline-line">
-                            {ENLISTED_TIERS.map((tier, i) => (
-                                <div key={i} className={`relative pl-8 pb-8 ${i === ENLISTED_TIERS.length - 1 ? 'last-item' : ''}`}>
-                                    <div className="timeline-connector"></div>
-                                    
-                                    {/* Interactive Node */}
-                                    <div 
-                                        onClick={() => setExpandedTier(expandedTier === i ? null : i)}
-                                        className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 shadow-md z-10 cursor-pointer transition-all hover:scale-110
-                                            ${expandedTier === i ? 'bg-[#00308F] border-blue-100 text-white' : 'bg-white border-slate-200 text-slate-400'}`}
-                                    >
-                                        <Icon name={tier.icon} size={20} />
-                                    </div>
+                            {ENLISTED_TIERS.map((tier, i) => {
+                                // Calculate Tier Progress
+                                const tierIds = [
+                                    ...tier.steps.map(s => `${tier.id}-${s.name}`),
+                                    ...tier.actionPlan.map(a => `${tier.id}-${a}`)
+                                ];
+                                const pct = getPercentage(tierIds);
 
-                                    {/* Card */}
-                                    <div 
-                                        onClick={() => setExpandedTier(expandedTier === i ? null : i)}
-                                        className={`cursor-pointer rounded-xl border transition-all duration-300 overflow-hidden bg-white
-                                            ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-blue-100' : 'border-slate-200 shadow-sm hover:border-blue-300'}`}
-                                    >
-                                        <div className="p-6 flex justify-between items-center">
-                                            <div>
-                                                <h4 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>{tier.title}</h4>
-                                                <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">{tier.ranks}</p>
-                                            </div>
-                                            <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="text-slate-400" />
+                                return (
+                                    <div key={i} className={`relative pl-8 pb-8 ${i === ENLISTED_TIERS.length - 1 ? 'last-item' : ''}`}>
+                                        <div className="timeline-connector"></div>
+                                        
+                                        {/* Interactive Node */}
+                                        <div 
+                                            onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                            className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 shadow-md z-10 cursor-pointer transition-all hover:scale-110
+                                                ${expandedTier === i ? 'bg-[#00308F] border-blue-100 text-white' : 'bg-white border-slate-200 text-slate-400'}`}
+                                        >
+                                            <Icon name={tier.icon} size={20} />
                                         </div>
 
-                                        {expandedTier === i && (
-                                            <div className="px-6 pb-6 bg-slate-50 border-t border-slate-100 animate-enter">
-                                                <p className="text-slate-600 mb-6 italic border-l-4 border-blue-200 pl-4 py-1">{tier.desc}</p>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {tier.steps.map((step, j) => (
-                                                        <div key={j} className="flex items-center bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                                                            <div className="bg-blue-50 p-2 rounded-full mr-3 text-[#00308F]">
-                                                                <Icon name="check-circle" size={14} />
-                                                            </div>
-                                                            <div>
-                                                                <span className="text-[10px] font-bold text-slate-400 uppercase block">{step.type}</span>
-                                                                <span className="text-sm font-bold text-slate-700">{step.name}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                        {/* Card */}
+                                        <div 
+                                            className={`cursor-default rounded-xl border transition-all duration-300 overflow-hidden bg-white
+                                                ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-blue-100' : 'border-slate-200 shadow-sm'}`}
+                                        >
+                                            <div 
+                                                onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                                className="p-6 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors"
+                                            >
+                                                <div>
+                                                    <h4 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>{tier.title}</h4>
+                                                    <p className="text-sm font-bold text-slate-500 uppercase tracking-wide">{tier.ranks}</p>
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    {/* Mini Progress Indicator */}
+                                                    <div className="text-xs font-bold text-slate-400">
+                                                        {pct}% Complete
+                                                    </div>
+                                                    <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="text-slate-400" />
                                                 </div>
                                             </div>
-                                        )}
+                                            
+                                            {/* Always visible progress bar at the bottom of the header */}
+                                            <div className="w-full bg-slate-100 h-1.5">
+                                                <div 
+                                                    className="bg-green-500 h-1.5 transition-all duration-500 progress-bar-fill" 
+                                                    style={{ width: `${pct}%` }}
+                                                ></div>
+                                            </div>
+
+                                            {expandedTier === i && (
+                                                <div className="animate-enter bg-white p-6 bg-slate-50/50">
+                                                    <p className="text-slate-600 mb-6 italic border-l-4 border-blue-200 pl-4 py-1">{tier.desc}</p>
+                                                    
+                                                    {/* BLUEPRINT FOCUS (Top) */}
+                                                    <div className="mb-8">
+                                                        <h5 className="text-xs font-bold text-[#00308F] uppercase mb-3 flex items-center"><Icon name="target" size={12} className="mr-1"/> Blueprint Competencies</h5>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                            {tier.blueprintFocus.map((focus, j) => (
+                                                                <div key={j} className="bg-white p-4 rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow group">
+                                                                    <div className="text-[#00308F] font-bold mb-2">{focus.title}</div>
+                                                                    <p className="text-xs text-slate-600 leading-relaxed">{focus.text}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {/* ROADMAP CHECKLIST */}
+                                                    <div className="mb-6">
+                                                        <h5 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center"><Icon name="check-square" size={12} className="mr-1"/> Core Requirements</h5>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                            {tier.steps.map((step, j) => {
+                                                                const itemId = `${tier.id}-${step.name}`;
+                                                                const checked = isComplete(itemId);
+                                                                return (
+                                                                    <div 
+                                                                        key={j} 
+                                                                        onClick={() => toggleItem(itemId)}
+                                                                        className={`flex items-center p-3 rounded-lg border shadow-sm cursor-pointer transition-all select-none
+                                                                            ${checked ? 'bg-green-50 border-green-200 shadow-inner' : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-md'}`}
+                                                                    >
+                                                                        <div className={`flex-shrink-0 h-6 w-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${checked ? 'bg-green-500 border-green-500' : 'border-slate-300 bg-white'}`}>
+                                                                            {checked && <Icon name="check" size={14} className="text-white" />}
+                                                                        </div>
+                                                                        <div>
+                                                                            <span className="text-[10px] font-bold text-slate-400 uppercase block">{step.type}</span>
+                                                                            <span className={`text-sm font-bold ${checked ? 'text-green-800' : 'text-slate-700'}`}>{step.name}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* ACTION PLAN CHECKLIST */}
+                                                    <div>
+                                                        <h5 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center"><Icon name="list" size={12} className="mr-1"/> Career Action Plan</h5>
+                                                        <div className="space-y-3">
+                                                            {tier.actionPlan.map((action, j) => {
+                                                                const itemId = `${tier.id}-${action}`;
+                                                                const checked = isComplete(itemId);
+                                                                return (
+                                                                    <div 
+                                                                        key={j} 
+                                                                        onClick={() => toggleItem(itemId)}
+                                                                        className={`flex items-center p-3 rounded-lg border shadow-sm cursor-pointer transition-all select-none
+                                                                            ${checked ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}
+                                                                    >
+                                                                        <div className={`h-5 w-5 rounded border-2 mr-4 flex-shrink-0 flex items-center justify-center transition-colors ${checked ? 'bg-green-500 border-green-500' : 'border-slate-300 bg-white'}`}>
+                                                                            {checked && <Icon name="check" size={12} className="text-white" />}
+                                                                        </div>
+                                                                        <span className={`text-sm font-semibold ${checked ? 'text-green-800 line-through opacity-70' : 'text-slate-700'}`}>{action}</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -937,68 +1190,109 @@
             );
         }
 
-        function CareerRoadmapView({ data, title }) {
-            const [expandedTier, setExpandedTier] = useState(null);
+        function CareerRoadmapView({ data, title, trackerId }) {
+            const [expandedTier, setExpandedTier] = useState(0); // Default open first item
+            
+            // TRACKING HOOK INIT (Separate key for officers)
+            const { toggleItem, isComplete, getPercentage, progress } = useProgress(trackerId || 'ca_ang_officer_v1');
 
             return (
                 <div className="animate-enter">
-                    <div className="border-b border-gray-200 pb-6 mb-8">
-                        <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
-                        <p className="text-slate-500 mt-2">Interactive Roadmap: Click on a tier to explore requirements.</p>
+                    <div className="border-b border-gray-200 pb-6 mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h2 className="text-3xl font-bold text-slate-900">{title}</h2>
+                            <p className="text-slate-500 mt-2">Interactive Roadmap: Click on a tier to explore requirements.</p>
+                        </div>
+                        <button 
+                            onClick={() => printProgress(title, data, progress)}
+                            className="mt-4 md:mt-0 flex items-center bg-white border border-slate-200 text-slate-600 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-bold"
+                        >
+                            <Icon name="printer" className="mr-2" size={18}/> Export Progress
+                        </button>
                     </div>
 
                     <div className="space-y-6">
-                        {data.map((tier, i) => (
-                            <div key={i} className="relative pl-12">
-                                <div className="timeline-connector"></div>
-                                
-                                {/* Node Icon */}
-                                <div className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-md z-10 transition-colors
-                                    ${expandedTier === i ? 'bg-[#00308F] text-white' : 'bg-white text-slate-400'}`}>
-                                    <Icon name={tier.icon} size={20} />
-                                </div>
+                        {data.map((tier, i) => {
+                             // Calculate Progress
+                             const tierIds = tier.steps.map(s => `${tier.id}-${s.name}`);
+                             const pct = getPercentage(tierIds);
 
-                                {/* Interactive Card */}
-                                <div 
-                                    onClick={() => setExpandedTier(expandedTier === i ? null : i)}
-                                    className={`bg-white rounded-xl border transition-all cursor-pointer overflow-hidden
-                                        ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-[#00308F]/20' : 'border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md'}`}
-                                >
-                                    <div className="p-6 flex flex-col md:flex-row md:items-center justify-between">
-                                        <div>
-                                            <h3 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>
-                                                {tier.title}
-                                            </h3>
-                                            <p className="text-sm font-bold text-slate-500 uppercase tracking-wide mt-1">{tier.ranks}</p>
-                                        </div>
-                                        <div className="mt-4 md:mt-0 flex items-center text-sm font-medium text-slate-500">
-                                            {expandedTier === i ? 'Collapse' : 'View Requirements'} 
-                                            <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="ml-2" />
-                                        </div>
+                             return (
+                                <div key={i} className="relative pl-12">
+                                    <div className="timeline-connector"></div>
+                                    
+                                    {/* Node Icon */}
+                                    <div className={`absolute left-0 top-0 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-md z-10 transition-colors
+                                        ${expandedTier === i ? 'bg-[#00308F] text-white' : 'bg-white text-slate-400'}`}>
+                                        <Icon name={tier.icon} size={20} />
                                     </div>
 
-                                    {/* Expanded Content */}
-                                    {expandedTier === i && (
-                                        <div className="bg-slate-50 border-t border-slate-100 p-6 animate-enter">
-                                            <p className="text-slate-600 mb-6 italic">{tier.desc}</p>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {tier.steps.map((step, j) => (
-                                                    <div key={j} className="bg-white p-4 rounded-lg border border-slate-200 flex items-center shadow-sm">
-                                                        <div className="p-2 bg-blue-50 rounded-full mr-3 text-[#00308F]">
-                                                            <Icon name="check-circle" size={16} />
-                                                        </div>
-                                                        <div>
-                                                            <div className="text-xs font-bold text-slate-400 uppercase">{step.type}</div>
-                                                            <div className="font-bold text-slate-800">{step.name}</div>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                    {/* Interactive Card */}
+                                    <div 
+                                        className={`bg-white rounded-xl border transition-all cursor-pointer overflow-hidden
+                                            ${expandedTier === i ? 'border-[#00308F] shadow-lg ring-1 ring-[#00308F]/20' : 'border-slate-200 shadow-sm hover:border-blue-300 hover:shadow-md'}`}
+                                    >
+                                        <div 
+                                            onClick={() => setExpandedTier(expandedTier === i ? null : i)}
+                                            className="p-6 flex justify-between items-center"
+                                        >
+                                            <div>
+                                                <h3 className={`text-xl font-bold ${expandedTier === i ? 'text-[#00308F]' : 'text-slate-800'}`}>
+                                                    {tier.title}
+                                                </h3>
+                                                <p className="text-sm font-bold text-slate-500 uppercase tracking-wide mt-1">{tier.ranks}</p>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-xs font-bold text-slate-400">
+                                                    {pct}% Complete
+                                                </div>
+                                                <Icon name={expandedTier === i ? 'chevron-up' : 'chevron-down'} className="text-slate-400" />
                                             </div>
                                         </div>
-                                    )}
+                                        
+                                        {/* Progress Bar */}
+                                        <div className="w-full bg-slate-100 h-1.5">
+                                            <div 
+                                                className="bg-green-500 h-1.5 transition-all duration-500 progress-bar-fill" 
+                                                style={{ width: `${pct}%` }}
+                                            ></div>
+                                        </div>
+
+                                        {/* Expanded Content */}
+                                        {expandedTier === i && (
+                                            <div className="bg-slate-50 border-t border-slate-100 animate-enter">
+                                                <div className="p-6">
+                                                    <p className="text-slate-600 mb-6 italic">{tier.desc}</p>
+                                                    <div className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center"><Icon name="check-square" size={12} className="mr-1"/> Click items to track progress</div>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        {tier.steps.map((step, j) => {
+                                                            const itemId = `${tier.id}-${step.name}`;
+                                                            const checked = isComplete(itemId);
+                                                            return (
+                                                                <div 
+                                                                    key={j} 
+                                                                    onClick={() => toggleItem(itemId)}
+                                                                    className={`flex items-center p-4 rounded-lg border shadow-sm cursor-pointer transition-all select-none
+                                                                        ${checked ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200 hover:border-blue-300'}`}
+                                                                >
+                                                                    <div className={`flex-shrink-0 h-6 w-6 rounded-full border-2 mr-3 flex items-center justify-center transition-all ${checked ? 'bg-green-500 border-green-500' : 'border-slate-300 bg-white'}`}>
+                                                                        {checked && <Icon name="check" size={14} className="text-white" />}
+                                                                    </div>
+                                                                    <div>
+                                                                        <div className="text-xs font-bold text-slate-400 uppercase">{step.type}</div>
+                                                                        <div className={`font-bold ${checked ? 'text-green-800' : 'text-slate-800'}`}>{step.name}</div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                             );
+                        })}
                     </div>
                 </div>
             );
