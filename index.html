@@ -39,11 +39,10 @@
 
         /* Unit Patch Hover Effect */
         .patch-hover {
-            transition: all 0.3s ease;
+            transition: transform 0.2s ease;
         }
         .patch-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: scale(1.05); 
         }
 
         /* Timeline Connector */
@@ -59,11 +58,20 @@
         .last-item .timeline-connector { display: none; }
 
         /* Custom Scrollbar for inner content */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
         /* Progress Bar Animation */
         .progress-bar-fill {
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
@@ -228,8 +236,8 @@
 
         // --- CONTENT CONFIGURATION ---
         
- const IMAGES = {
-            logo: "https://lh3.googleusercontent.com/sitesv/AAzXCkeRj3L7Wr3A1GgT8aNuCBb8xNiFBCCaLGNhfPn2ih-sXeoKkZ-9Fr4YfTkjRknnXVUK1xL3-y_egSU4M8RX9xWXBuJ5vErlAnKpm5NcuBsUvrrFiQ3_mMtaTdTobvCPNzeGe8DQcya16NnKJXumWH3_ddj48fAijvI6alNwS6h-2wWYXVO3uVFnAlo=w16383",
+        const IMAGES = {
+            logo: "image_3c6695.png",
             unit129: "129.svg",
             unit144: "144.svg",
             unit146: "146.svg",
@@ -237,7 +245,7 @@
             unit195: "195.svg",
             commander: "butow.jpg",
             chief: "zweben.jpg",
-            blueBook: "https://lh3.googleusercontent.com/sitesv/AAzXCkcDrCG4xwEpkoZGDpYMxk6afDkcuNr2et13JXjLtVl0P2xdsBKz28XWexpQi-RXMsx1F0CyGis8hjVpgQIQWTeO6WBOGCHefBOx6Cyz7t9goUER2KTKl0eFlj5UE1vkfex-4Rw5Dipz0SMhqIrvNtg4IVn3wvoe4JrO0n0E1VZqc7DOpIBMXWWfAaGwO27d_921U_4HO6DXtgYASeBoZqY-RrN_UthC-cTfccI=w1280",
+            blueBook: "image_37bbf7.png",
             brownBook: "https://lh3.googleusercontent.com/sitesv/AAzXCke8skZ0_uFovkLkBAjrzJ5WcNHFWNTktKPYEGEvT32JFUhcaS8vyLl2OWrl3l7mCrE5GW7WE6NWfTQV8GwBqDLLBuWXfq-LCOVWwIQJVBsKfGVdM9XwodCP9GRVuY9eYpBIZ9MIMZj-5YGxa71E7P1ABb8-nwHTFrrr2NNfMI-twsXykoaUtOMaziA0rpkvvAehvw1Nqdelw6U96FCZhESDkcFb0bbCIzAG6iU=w1280",
             blueprint: "https://lh3.googleusercontent.com/sitesv/AAzXCkdVW9-kq4HJLeKeWkNknTue4T-KEWfZdwRILibS_pbHFQK6_uTuEacG62ukkMkO6Bkm_6j4c5QVhCo77NyNDEHEH1-n8WWu8cvOg6SIpMwrmXKnbqLuIGiy79mHF24a22X8v3-ATf_EjiupDHUDKGil30qzulfSwxddrVu4ptnmeDdZp_rHa3NqNJDzHbXDGU3obi1vPRsSHH_FO4fccju8E6kqARcD_gcb=w1280"
         };
@@ -620,7 +628,7 @@
                         {/* Leadership */}
                         <div className="lg:col-span-4 bg-slate-50/80 rounded-2xl p-6 border border-slate-200">
                             <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center">
-                                <Icon name="star" className="mr-2 text-yellow-600 fill-current" /> Leadership
+                                <Icon name="star" className="mr-2 text-[#00308F] fill-current" /> Leadership
                             </h3>
                             <div className="space-y-8">
                                 {LEADERSHIP.map((leader, i) => (
@@ -660,7 +668,7 @@
                                                         {item.type}
                                                     </span>
                                                     <span className="text-xs text-slate-400 flex items-center">
-                                                        <Icon name="clock" size={10} className="mr-1"/> {item.date}
+                                                        {item.date}
                                                     </span>
                                                 </div>
                                                 <h4 className="font-bold text-slate-800 group-hover:text-[#00308F] transition-colors">{item.title}</h4>
@@ -726,37 +734,37 @@
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div onClick={() => setMode('profession')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
-                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
-                                    <Icon name="award" size={32} />
+                            <div onClick={() => setMode('profession')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group text-center">
+                                <div className="mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="award" size={40} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Profession of Arms</h3>
                                 <p className="text-slate-500">More than a job. The responsibility and expertise of our service.</p>
                             </div>
-                            <div onClick={() => setMode('airmanship')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
-                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
-                                    <Icon name="plane" size={32} />
+                            <div onClick={() => setMode('airmanship')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group text-center">
+                                <div className="mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="plane" size={40} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Airmanship</h3>
                                 <p className="text-slate-500">The mindset, the oath, and the creed of an American Airman.</p>
                             </div>
-                            <div onClick={() => setMode('explore')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
-                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
-                                    <Icon name="book-open" size={32} />
+                            <div onClick={() => setMode('explore')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group text-center">
+                                <div className="mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="book-open" size={40} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Core Values</h3>
                                 <p className="text-slate-500">Deep dive into Integrity, Service, and Excellence.</p>
                             </div>
-                            <div onClick={() => setMode('conduct')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group">
-                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
-                                    <Icon name="flag" size={32} />
+                            <div onClick={() => setMode('conduct')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group text-center">
+                                <div className="mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="flag" size={40} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Code of Conduct</h3>
                                 <p className="text-slate-500">Ethical guide for members of the Armed Forces.</p>
                             </div>
-                            <div onClick={() => setMode('challenge')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group md:col-span-2 lg:col-span-1">
-                                <div className="bg-blue-50 w-16 h-16 rounded-full flex items-center justify-center mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
-                                    <Icon name="shield" size={32} />
+                            <div onClick={() => setMode('challenge')} className="bg-white p-8 rounded-xl border-2 border-slate-100 hover:border-[#00308F] cursor-pointer shadow-sm hover:shadow-lg transition-all group md:col-span-2 lg:col-span-1 text-center">
+                                <div className="mb-4 text-[#00308F] group-hover:scale-110 transition-transform">
+                                    <Icon name="shield" size={40} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">Guardian Challenge</h3>
                                 <p className="text-slate-500">Test your ethical decision-making in real scenarios.</p>
@@ -909,7 +917,7 @@
                         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
                             <div className="bg-slate-900 p-6 text-white flex justify-between items-center">
                                 <h3 className="font-bold text-lg">Scenario {challengeIdx + 1} of {BLUE_BOOK_SCENARIOS.length}</h3>
-                                <Icon name="shield" className="text-yellow-400" />
+                                <Icon name="shield" className="text-blue-400" />
                             </div>
                             <div className="p-8">
                                 <p className="text-xl text-slate-800 font-medium mb-8 leading-relaxed">
