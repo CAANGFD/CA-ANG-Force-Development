@@ -10,6 +10,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@0.292.0"></script>
 
     <style>
@@ -57,7 +59,7 @@
         }
         .last-item .timeline-connector { display: none; }
 
-        /* Custom Scrollbar for inner content */
+        /* Custom Scrollbar */
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
         }
@@ -76,6 +78,15 @@
         .progress-bar-fill {
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        /* Flip Card Utilities */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        /* Flip Card Hover State */
+        .group:hover .group-hover\:rotate-y-180 { transform: rotateY(180deg); }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -222,6 +233,8 @@
         // --- Icon Wrapper ---
         const Icon = ({ name, size = 18, className = "" }) => {
             const iconRef = useRef(null);
+            
+            // Effect to trigger Lucide to replace the <i> tag with SVG
             useEffect(() => {
                 if (window.lucide) {
                     window.lucide.createIcons({
@@ -231,13 +244,58 @@
                     });
                 }
             }, [name, size, className]);
+
             return <span ref={iconRef}><i data-lucide={name} className={className}></i></span>;
+        };
+
+        // --- FOCUS AREA CARD COMPONENT (FLIP EFFECT) ---
+        const FocusAreaCard = ({ title, text, icon, bullets }) => {
+            const [isMobile, setIsMobile] = useState(false);
+            const [flipped, setFlipped] = useState(false);
+
+            return (
+                <div 
+                    className="group perspective-1000 h-64 w-full cursor-pointer"
+                    onClick={() => setFlipped(!flipped)}
+                    onMouseEnter={() => setFlipped(true)}
+                    onMouseLeave={() => setFlipped(false)}
+                >
+                    <div className={`relative h-full w-full transition-all duration-500 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}>
+                        
+                        {/* FRONT */}
+                        <div className="absolute inset-0 h-full w-full bg-white rounded-xl shadow-md border border-slate-200 p-6 flex flex-col items-center justify-center text-center backface-hidden z-20">
+                            <div className="bg-blue-50 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
+                                <Icon name={icon} size={32} className="text-[#00308F]" />
+                            </div>
+                            <h4 className="text-lg font-bold text-slate-900 mb-2">{title}</h4>
+                            <p className="text-xs text-slate-500 line-clamp-3">{text}</p>
+                            <div className="mt-auto pt-4 text-xs font-bold text-[#00308F] uppercase tracking-wider flex items-center">
+                                Tap to Flip <Icon name="refresh-cw" size={10} className="ml-1"/>
+                            </div>
+                        </div>
+
+                        {/* BACK */}
+                        <div className="absolute inset-0 h-full w-full bg-[#00308F] rounded-xl shadow-lg p-6 flex flex-col backface-hidden rotate-y-180 z-10 text-white overflow-hidden">
+                            <h4 className="text-md font-bold mb-3 border-b border-blue-400 pb-2">{title}</h4>
+                            <ul className="text-sm space-y-2 overflow-y-auto custom-scroll">
+                                {bullets && bullets.map((bullet, i) => (
+                                    <li key={i} className="flex items-start">
+                                        <Icon name="check-circle" size={14} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" />
+                                        <span className="text-blue-50 leading-snug">{bullet}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
         // --- CONTENT CONFIGURATION ---
         
+        // PLACEHOLDER IMAGES
         const IMAGES = {
-            logo: "image_3c6695.png",
+            logo: "caang.png",
             unit129: "129.svg",
             unit144: "144.svg",
             unit146: "146.svg",
@@ -247,7 +305,7 @@
             chief: "zweben.jpg",
             blueBook: "bluebook.jpg",
             brownBook: "brownbook.jpg",
-            blueprint: "https://lh3.googleusercontent.com/sitesv/AAzXCkdVW9-kq4HJLeKeWkNknTue4T-KEWfZdwRILibS_pbHFQK6_uTuEacG62ukkMkO6Bkm_6j4c5QVhCo77NyNDEHEH1-n8WWu8cvOg6SIpMwrmXKnbqLuIGiy79mHF24a22X8v3-ATf_EjiupDHUDKGil30qzulfSwxddrVu4ptnmeDdZp_rHa3NqNJDzHbXDGU3obi1vPRsSHH_FO4fccju8E6kqARcD_gcb=w1280"
+            blueprint: "blueprint.jpg"
         };
 
         const ANNOUNCEMENTS = [
@@ -300,10 +358,25 @@
                     { name: 'CDCs / Upgrade', type: 'Education' },
                     { name: 'ALS (Airman Leadership School)', type: 'PME' }
                 ],
-                blueprintFocus: [
-                    { title: 'Warrior Ethos', text: 'Understand the profession of arms and the oath of enlistment.' },
-                    { title: 'Self-Control', text: 'Demonstrate emotional intelligence and discipline under stress.' },
-                    { title: 'Resilience', text: 'Develop physical, social, spiritual, and mental fitness.' }
+                focusAreas: [
+                    { 
+                        title: 'Occupational Proficiency', 
+                        text: 'Developing the technical skills required for your specific AFSC.',
+                        icon: 'wrench',
+                        bullets: ['Master CDCs and 5-Level Tasks', 'Achieve Technical Readiness', 'Understand AFSC Contribution']
+                    },
+                    { 
+                        title: 'Warrior Ethos', 
+                        text: 'Internalizing the Profession of Arms and the Core Values.',
+                        icon: 'shield',
+                        bullets: ['Embody Core Values', 'Understand the Oath', 'Maintain Standards']
+                    },
+                    { 
+                        title: 'Personal Resilience', 
+                        text: 'Building physical, social, spiritual, and mental fitness.',
+                        icon: 'heart',
+                        bullets: ['Comprehensive Airman Fitness', 'Financial Readiness', 'Social Connection']
+                    }
                 ],
                 actionPlan: ['Complete Career Development Course (CDCs)', 'Find a Mentor (NCO)', 'Enroll in CCAF']
             },
@@ -317,10 +390,25 @@
                     { name: 'CCAF Degree', type: 'Education' },
                     { name: 'Supervisor Safety Course', type: 'Training' }
                 ],
-                blueprintFocus: [
-                    { title: 'Leadership', text: 'Transition from "doing" to "leading". Guide others to success.' },
-                    { title: 'Team Building', text: 'Foster an inclusive environment and build trust within the team.' },
-                    { title: 'Communication', text: 'Effectively translate strategic goals into tactical actions.' }
+                focusAreas: [
+                    { 
+                        title: 'Frontline Leadership', 
+                        text: 'Transitioning from "doing" to "leading" small teams.',
+                        icon: 'users',
+                        bullets: ['Guide Subordinate Development', 'Enforce Standards', 'Provide Feedback (ACA)']
+                    },
+                    { 
+                        title: 'Team Building', 
+                        text: 'Fostering an inclusive environment and building trust.',
+                        icon: 'link',
+                        bullets: ['Conflict Resolution', 'Promote Diversity & Inclusion', 'Foster Team Cohesion']
+                    },
+                    { 
+                        title: 'Resource Management', 
+                        text: 'Effective use of time, equipment, and manpower.',
+                        icon: 'pie-chart',
+                        bullets: ['Manage Workcenter Resources', 'Safety & Risk Management', 'Process Improvement']
+                    }
                 ],
                 actionPlan: ['Attend NCOA (In-Residence or Satellite)', 'Seek Opportunities to Lead Projects', 'Mentor Junior Airmen']
             },
@@ -334,10 +422,25 @@
                     { name: 'Superintendent Course', type: 'Training' },
                     { name: 'Strategic Placements', type: 'Experience' }
                 ],
-                blueprintFocus: [
-                    { title: 'Strategic Vision', text: 'Understand the "Why" behind the mission and communicate it.' },
-                    { title: 'Organizational Mgmt', text: 'Manage resources, manpower, and unit culture effectively.' },
-                    { title: 'Joint Operations', text: 'Understand how the Air Force integrates with other branches.' }
+                focusAreas: [
+                    { 
+                        title: 'Strategic Vision', 
+                        text: 'Translating strategic goals into tactical execution.',
+                        icon: 'compass',
+                        bullets: ['Communicate the "Why"', 'Align Unit Goals with Wing', 'Advise Commanders']
+                    },
+                    { 
+                        title: 'Organizational Mgmt', 
+                        text: 'Managing resources, manpower, and unit culture effectively.',
+                        icon: 'briefcase',
+                        bullets: ['Manpower Management', 'Talent Management', 'Unit Climate Assessment']
+                    },
+                    { 
+                        title: 'Joint Perspective', 
+                        text: 'Understanding how the Air Force integrates with other branches.',
+                        icon: 'globe',
+                        bullets: ['Joint Operations', 'Inter-agency Cooperation', 'Total Force Integration']
+                    }
                 ],
                 actionPlan: ['Complete SEJPME I/II', 'Attend SNCOA', 'Join a Council (EAC/FDC)']
             }
@@ -352,6 +455,26 @@
                     { name: 'Officer Training', type: 'Accession' },
                     { name: 'Tech School / Upgrade', type: 'Training' },
                     { name: 'SOS (Squadron Officer School)', type: 'PME' }
+                ],
+                focusAreas: [
+                    { 
+                        title: 'Tactical Mastery', 
+                        text: 'Developing deep expertise in your primary weapon system or function.',
+                        icon: 'crosshair',
+                        bullets: ['System Expertise', 'Tactical Execution', 'Operational Risk Management']
+                    },
+                    { 
+                        title: 'Leading Flights', 
+                        text: 'First experiences in command and personnel management.',
+                        icon: 'users',
+                        bullets: ['Flight Command', 'Personnel Evaluations', 'Mentoring NCOs/Airmen']
+                    },
+                    { 
+                        title: 'Communication', 
+                        text: 'Briefing, writing, and communicating intent clearly.',
+                        icon: 'message-square',
+                        bullets: ['Military Writing', 'Briefing Skills', 'Interpersonal Communication']
+                    }
                 ]
             },
             {
@@ -362,6 +485,26 @@
                     { name: 'ACSC (Air Command & Staff College)', type: 'PME' },
                     { name: 'Masters Degree', type: 'Education' },
                     { name: 'Joint PME Phase I', type: 'PME' }
+                ],
+                focusAreas: [
+                    { 
+                        title: 'Operational Art', 
+                        text: 'Planning and executing complex campaigns and operations.',
+                        icon: 'map',
+                        bullets: ['Campaign Planning', 'Joint Capabilities', 'Operational Design']
+                    },
+                    { 
+                        title: 'Squadron Command', 
+                        text: 'Leading units, managing UCMJ, and resourcing missions.',
+                        icon: 'flag',
+                        bullets: ['UCMJ Authority', 'Resource Programming', 'Unit Culture']
+                    },
+                    { 
+                        title: 'Staff Integration', 
+                        text: 'Working effectively within Wing, NAF, or MAJCOM staffs.',
+                        icon: 'layers',
+                        bullets: ['Staff Work', 'Policy Development', 'Cross-functional Integration']
+                    }
                 ]
             },
             {
@@ -372,6 +515,26 @@
                     { name: 'AWC (Air War College)', type: 'PME' },
                     { name: 'Joint PME Phase II', type: 'PME' },
                     { name: 'Strategic Planning Seminar', type: 'Training' }
+                ],
+                focusAreas: [
+                    { 
+                        title: 'Strategic Leadership', 
+                        text: 'Shaping the future of the force and long-term strategy.',
+                        icon: 'globe',
+                        bullets: ['Strategic Planning', 'Force Design', 'Legislative Liaison']
+                    },
+                    { 
+                        title: 'Joint Integration', 
+                        text: 'Leading in a joint, interagency, and multinational environment.',
+                        icon: 'share-2',
+                        bullets: ['Joint Task Force', 'Coalition Building', 'Diplomacy']
+                    },
+                    { 
+                        title: 'Enterprise Management', 
+                        text: 'Overseeing large-scale organizations and budgets.',
+                        icon: 'bar-chart-2',
+                        bullets: ['Fiscal Programming', 'Infrastructure Strategy', 'Talent Management']
+                    }
                 ]
             }
         ];
@@ -1094,15 +1257,18 @@
                                                 <div className="animate-enter bg-white p-6 bg-slate-50/50">
                                                     <p className="text-slate-600 mb-6 italic border-l-4 border-blue-200 pl-4 py-1">{tier.desc}</p>
                                                     
-                                                    {/* BLUEPRINT FOCUS (Top) */}
-                                                    <div className="mb-8">
-                                                        <h5 className="text-xs font-bold text-[#00308F] uppercase mb-3 flex items-center"><Icon name="target" size={12} className="mr-1"/> Blueprint Competencies</h5>
-                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                            {tier.blueprintFocus.map((focus, j) => (
-                                                                <div key={j} className="bg-white p-4 rounded-lg border border-blue-100 shadow-sm hover:shadow-md transition-shadow group">
-                                                                    <div className="text-[#00308F] font-bold mb-2">{focus.title}</div>
-                                                                    <p className="text-xs text-slate-600 leading-relaxed">{focus.text}</p>
-                                                                </div>
+                                                    {/* FOCUS AREAS (Interactive Flip Cards) */}
+                                                    <div className="mb-10">
+                                                        <h5 className="text-xs font-bold text-[#00308F] uppercase mb-4 flex items-center"><Icon name="target" size={12} className="mr-1"/> Focus Areas (Tap to Flip)</h5>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                                            {tier.focusAreas.map((focus, j) => (
+                                                                <FocusAreaCard 
+                                                                    key={j}
+                                                                    title={focus.title}
+                                                                    text={focus.text}
+                                                                    icon={focus.icon}
+                                                                    bullets={focus.bullets}
+                                                                />
                                                             ))}
                                                         </div>
                                                     </div>
@@ -1271,6 +1437,25 @@
                                             <div className="bg-slate-50 border-t border-slate-100 animate-enter">
                                                 <div className="p-6">
                                                     <p className="text-slate-600 mb-6 italic">{tier.desc}</p>
+                                                    
+                                                    {/* FOCUS AREAS (Interactive Flip Cards) */}
+                                                    {tier.focusAreas && (
+                                                        <div className="mb-10">
+                                                            <div className="text-xs font-bold text-[#00308F] uppercase mb-4 flex items-center"><Icon name="target" size={12} className="mr-1"/> Focus Areas (Tap to Flip)</div>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                                                {tier.focusAreas.map((focus, j) => (
+                                                                    <FocusAreaCard 
+                                                                        key={j}
+                                                                        title={focus.title}
+                                                                        text={focus.text}
+                                                                        icon={focus.icon}
+                                                                        bullets={focus.bullets}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
                                                     <div className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center"><Icon name="check-square" size={12} className="mr-1"/> Click items to track progress</div>
                                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                         {tier.steps.map((step, j) => {
