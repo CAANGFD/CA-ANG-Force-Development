@@ -14,7 +14,7 @@
     <!-- Lucide Core -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat versions for simpler global usage) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -48,21 +48,34 @@
         const { useState, useEffect, useRef, useMemo } = React;
 
         // --- FIREBASE INITIALIZATION ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "",
-            authDomain: "",
-            projectId: "",
-            storageBucket: "",
-            messagingSenderId: "",
-            appId: ""
-        };
+        // Safety wrapper to prevent blank page on GitHub if config is missing
+        let db = null;
+        let auth = null;
+        let appId = "ca-ang-force-dev";
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        try {
+            const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+            const firebaseConfig = rawConfig ? JSON.parse(rawConfig) : {
+                apiKey: "", // REPLACE WITH YOUR OWN FIREBASE KEYS FOR GITHUB
+                authDomain: "",
+                projectId: "",
+                storageBucket: "",
+                messagingSenderId: "",
+                appId: ""
+            };
+
+            // Only initialize if we have at least an API key
+            if (firebaseConfig.apiKey) {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'ca-ang-force-dev';
+            }
+        } catch (e) {
+            console.error("Firebase Initialization Error: ", e);
         }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ca-ang-force-dev';
 
         // --- CONSTANTS & ASSETS ---
         const ADMIN_PASSWORD = "change-me-1234"; 
@@ -206,10 +219,19 @@
                 focusAreas: [
                     { title: 'Command', text: 'Leading Flights.', bullets: ['Personnel Admin', 'Mission Planning', 'Flight Morale'] }
                 ] 
+            },
+            { 
+                id: 'fgo', title: 'Field Grade', ranks: 'Maj - Lt Col', icon: 'Layers', 
+                steps: ['ACSC', 'Joint PME I', 'Squadron Command Course'], 
+                desc: 'Operational leaders and squadron command.', 
+                focusAreas: [
+                    { title: 'Command', text: 'Leading Squadrons.', bullets: ['Strategic Intent', 'Unit Discipline'] }
+                ] 
             }
         ];
 
-        // --- DYNAMIC ICON COMPONENT ---
+        // --- COMPONENTS ---
+
         const Icon = ({ name, size = 24, className = "" }) => {
             const containerRef = useRef(null);
             useEffect(() => {
@@ -233,7 +255,7 @@
         const useProgress = (user) => {
             const [progress, setProgress] = useState({});
             useEffect(() => {
-                if (!user) return;
+                if (!user || !db) return;
                 const progressRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress');
                 const unsub = progressRef.onSnapshot((snap) => {
                     const data = {};
@@ -244,7 +266,7 @@
             }, [user]);
 
             const toggleItem = async (id) => {
-                if (!user) return;
+                if (!user || !db) return;
                 const itemRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress').doc(id);
                 await itemRef.set({ completed: !progress[id] }, { merge: true });
             };
@@ -368,7 +390,7 @@
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[
                         { label: 'Courses', icon: 'graduation-cap', tab: 'cfdc' },
-                        { label: 'Library', icon: 'library', tab: 'resources' },
+                        { label: 'Library', icon: 'book-open', tab: 'resources' },
                         { label: 'ALQs', icon: 'target', cat: 'ALQs' },
                         { label: 'Strategic', icon: 'globe', tab: 'strategy' },
                     ].map((item, i) => (
@@ -514,6 +536,7 @@
             const [form, setForm] = useState({ title: '', category: '', description: '', link: '' });
             const handleSave = async (e) => {
                 e.preventDefault();
+                if (!db) return;
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('resources').add({ ...form, dateAdded: new Date().toISOString() });
                 setForm({ title: '', category: '', description: '', link: '' });
             };
@@ -652,16 +675,18 @@
                 const initAuth = async () => {
                     try {
                         const token = typeof __initial_auth_token !== 'undefined' && __initial_auth_token ? __initial_auth_token : null;
-                        if (token) { await auth.signInWithCustomToken(token); }
-                        else { await auth.signInAnonymously(); }
+                        if (auth) {
+                            if (token) { await auth.signInWithCustomToken(token); }
+                            else { await auth.signInAnonymously(); }
+                        }
                     } catch (e) { console.error("Auth error", e); }
                 };
                 initAuth();
-                return auth.onAuthStateChanged(setUser);
+                if (auth) return auth.onAuthStateChanged(setUser);
             }, []);
 
             useEffect(() => {
-                if (!user) return;
+                if (!user || !db) return;
                 const unsubRes = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('resources')
                     .onSnapshot(snap => {
                         const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); setResources(list);
