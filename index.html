@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CA ANG Force Development</title>
+    <title>CA ANG Force Development Hub</title>
     
     <!-- Dependencies -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -14,7 +14,7 @@
     <!-- Lucide Core -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Firebase SDK (Compat versions for simpler global usage) -->
+    <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -47,38 +47,9 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useMemo } = React;
 
-        // --- FIREBASE INITIALIZATION ---
-        // Safety wrapper to prevent blank page on GitHub if config is missing
-        let db = null;
-        let auth = null;
-        let appId = "ca-ang-force-dev";
-
-        try {
-            const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            const firebaseConfig = rawConfig ? JSON.parse(rawConfig) : {
-                apiKey: "", // REPLACE WITH YOUR OWN FIREBASE KEYS FOR GITHUB
-                authDomain: "",
-                projectId: "",
-                storageBucket: "",
-                messagingSenderId: "",
-                appId: ""
-            };
-
-            // Only initialize if we have at least an API key
-            if (firebaseConfig.apiKey) {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                auth = firebase.auth();
-                db = firebase.firestore();
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'ca-ang-force-dev';
-            }
-        } catch (e) {
-            console.error("Firebase Initialization Error: ", e);
-        }
-
         // --- CONSTANTS & ASSETS ---
         const ADMIN_PASSWORD = "change-me-1234"; 
+        const firebaseAppId = typeof __app_id !== 'undefined' ? __app_id : 'ca-ang-force-dev';
 
         const IMAGES = {
             logo: "caang.png",
@@ -107,128 +78,164 @@
             { name: 'Chief Master Sergeant Seth M. Zweben', title: 'State Command Chief', org: 'California Air National Guard', img: IMAGES.chief }
         ];
 
+        // --- EXHAUSTIVE BOOK CONTENT ---
         const BOOK_CONTENT = {
             blue: {
                 title: "The Blue Book",
-                subtitle: "The Profession of Arms",
+                subtitle: "The Profession of Arms (AFM 1-1)",
                 sections: [
-                    { title: "Core Values", items: ["Integrity First", "Service Before Self", "Excellence In All We Do"], desc: "The foundation of our culture and our character." },
-                    { title: "The Oath", items: ["Support & Defend", "Bear True Faith", "Obey the Orders"], desc: "Our solemn commitment to the Constitution." },
-                    { title: "The Creed", items: ["I am an American Airman", "Wingman, Leader, Warrior", "I will not fail"], desc: "The spirit of our identity." }
+                    { 
+                        title: "Chapter 1: The Airman's Identity", 
+                        desc: "Defining who we are as members of the Profession of Arms.",
+                        subsections: [
+                            { name: "The Oath", items: ["Support & Defend the Constitution", "Obedience to Orders", "Lifelong Commitment"], detail: "The Oath is a solemn promise and the foundation of our military service." },
+                            { name: "Warrior Ethos", items: ["Warrior Spirit", "Hardiness of Spirit", "Moral Courage"], detail: "Every Airman is a warfighter, maintaining physical and mental readiness for combat." },
+                            { name: "Identity", items: ["Guardian of Freedom", "Wingman, Leader, Warrior", "I will not fail"], detail: "Our communal bond as Airmen defines our role in National Defense." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 2: Core Values", 
+                        desc: "The virtues that define our character and the Air Force culture.",
+                        subsections: [
+                            { name: "Integrity First", items: ["Honesty", "Courage", "Accountability"], detail: "Doing the right thing even when no one is watching." },
+                            { name: "Service Before Self", items: ["Duty", "Loyalty", "Respect"], detail: "Professional duties take precedence over personal desires." },
+                            { name: "Excellence In All We Do", items: ["Mission", "Discipline", "Teamwork"], detail: "Continuous improvement in technical and leadership areas." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 3: Professional Conduct", 
+                        desc: "The standards of behavior and appearance.",
+                        subsections: [
+                            { name: "Standards", items: ["AFI 36-2903", "Dress and Appearance", "Customs & Courtesies"], detail: "Upholding the proud traditions and professional image of the service." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 4: Development", 
+                        desc: "Developing the whole Airman.",
+                        subsections: [
+                            { name: "Attributes", items: ["Resilience", "Self-Awareness", "Communication"], detail: "Building character through deliberate training and reflection." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 5: Professional Continuum", 
+                        desc: "Lifelong growth within the profession.",
+                        subsections: [
+                            { name: "The Journey", items: ["PME", "Lethal Edge", "Global Reach"], detail: "Our transition from technical experts to strategic leaders." }
+                        ]
+                    }
                 ]
             },
             brown: {
                 title: "The Brown Book",
-                subtitle: "Enlisted Force Structure",
+                subtitle: "Enlisted Force Structure (AFH 36-2618)",
                 sections: [
-                    { title: "Junior Enlisted", items: ["Adaptation", "Proficiency", "Execution"], desc: "The AB-SrA Tier focusing on the 'Technical' level." },
-                    { title: "NCO Tier", items: ["Leading Small Teams", "Supervisor Safety", "Mentorship"], desc: "SSgt-TSgt Tier bridging technical and organizational skill." },
-                    { title: "Senior NCO", items: ["Strategic Advisory", "Unit Climate", "Enterprise Management"], desc: "MSgt-CMSgt Tier focused on strategic vision." }
+                    { 
+                        title: "Chapter 1: Force Structure Levels", 
+                        desc: "Tactical, Operational, and Strategic leadership levels.",
+                        subsections: [
+                            { name: "Levels", items: ["Tactical (Mastery)", "Operational (Management)", "Strategic (Vision)"], detail: "The levels at which enlisted members execute leadership and management." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 2: Enlisted Tiers", 
+                        desc: "Rank-specific roles and expectations across the continuum.",
+                        subsections: [
+                            { name: "Junior Enlisted (AB-SrA)", items: ["Technical Proficient", "Finish ALS"], detail: "Technical proficiency and adaptation to the Air Force." },
+                            { name: "NCO Tier (SSgt-TSgt)", items: ["Supervisor", "SME", "Team Lead"], detail: "Bridging the gap between technicians and senior management." },
+                            { name: "Senior NCO (MSgt-CMSgt)", items: ["Strategic Advisor", "Organizational Manager"], detail: "Ensuring unit readiness and advising commanders." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 3: General Responsibilities", 
+                        desc: "Common requirements for all Enlisted Airmen.",
+                        subsections: [
+                            { name: "Readiness", items: ["Physical Fitness", "Mental Wellness", "Functional Skill"], detail: "Always ready for global mission execution." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 4: Specific Positions", 
+                        desc: "Leadership roles unique to the enlisted structure.",
+                        subsections: [
+                            { name: "Key Positions", items: ["First Sergeant", "Command Chief", "SEL"], detail: "Specialized roles to manage personnel health and policy." }
+                        ]
+                    },
+                    { 
+                        title: "Chapter 5: Development & Feedback", 
+                        desc: "The deliberate career progression cycle.",
+                        subsections: [
+                            { name: "Mentoring", items: ["ACA Feedback", "Standards", "Career Path"], detail: "Ensuring every Airman has a roadmap for success." }
+                        ]
+                    }
                 ]
             },
             blueprint: {
                 title: "The Blueprint",
-                subtitle: "Force Development Roadmap",
+                subtitle: "Enlisted Force Development",
                 sections: [
-                    { title: "Foundational", items: ["ALS", "7-Level Upgrade", "CCAF"], desc: "Initial professional growth and technical mastery." },
-                    { title: "Operational", items: ["NCOA", "SNCOA", "Leadership Seminars"], desc: "Broadening leadership capacity at the Wing level." },
-                    { title: "Strategic", items: ["Joint PME", "Advanced Education", "Selection Boards"], desc: "Preparing for State and National leadership roles." }
-                ]
-            }
-        };
-
-        const CFDC_SEED = {
-            '300': {
-                id: '300',
-                title: 'CFDC 300',
-                subtitle: 'Foundational Broadening',
-                target: 'AB - SSgt / 2Lt - Capt',
-                timeline: '3-Day Seminar',
-                enrollmentLink: '#',
-                overview: 'Transition from Technical Specialist to Professional Airman. Focuses on CA ANG heritage and individual accountability.',
-                objectives: [
-                    'Understand Title 32 (State) vs Title 10 (Federal) mission sets.',
-                    'Apply Emotional Intelligence to team dynamics.',
-                    'Master foundational military communication standards.'
-                ]
-            },
-            '500': {
-                id: '500',
-                title: 'CFDC 500',
-                subtitle: 'Operational Leadership',
-                target: 'TSgt - MSgt / Major',
-                timeline: '4-Day Workshop',
-                enrollmentLink: '#',
-                overview: 'Bridging unit execution and organizational strategy. Focuses on performance management and unit admin.',
-                objectives: [
-                    'Master the ACA and feedback cycle.',
-                    'Manage unit personnel actions and resources.',
-                    'Navigate UCMJ authority and documentation.'
-                ]
-            },
-            '700': {
-                id: '700',
-                title: 'CFDC 700',
-                subtitle: 'Strategic Broadening',
-                target: 'SMSgt - CMSgt / Lt Col - Col',
-                timeline: '5-Day Executive Course',
-                enrollmentLink: '#',
-                overview: 'Senior leadership focus on strategic enterprise, legislative processes, and Great Power Competition.',
-                objectives: [
-                    'Navigate state legislative and budgeting cycles.',
-                    'Synthesize GPC concepts into wing readiness.',
-                    'Manage strategic messaging and organizational culture.'
+                    { 
+                        title: "Foundational Qualities", 
+                        desc: "The skills required for the Great Power Competition.",
+                        subsections: [
+                            { name: "The Qualities", items: ["Decision Making", "Innovation", "Resilience"], detail: "Core strengths needed for modern conflict." }
+                        ]
+                    },
+                    { 
+                        title: "Career Continuum", 
+                        desc: "A deliberate roadmap for growth.",
+                        subsections: [
+                            { name: "Milestones", items: ["ALS/NCOA/SNCOA", "Joint Roles", "Degree Completion"], detail: "Growth through education, training, and experience." }
+                        ]
+                    }
                 ]
             }
         };
 
         const ENLISTED_ROADMAP = [
             { 
-                id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', 
-                steps: ['Basic Training', 'Tech School', 'CDCs/5-Level', 'ALS'], 
-                desc: 'Mission proficiency and adaptation.', 
+                id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', steps: ['BMT', 'Tech School', '5-Level Upgrade', 'ALS'], 
+                desc: 'Technical proficiency and adaptation to the profession of arms.', 
                 focusAreas: [
-                    { title: 'Technical Mastery', text: 'Achieving proficiency in your AFSC.', bullets: ['Complete CDCs', 'Attain Journeyman', 'Master Tasks'] },
-                    { title: 'Warrior Ethos', text: 'Core Values daily.', bullets: ['Warrior Ethos', 'Accountability', 'Physical Fitness'] },
-                    { title: 'Resilience', text: 'Building personal fitness.', bullets: ['Financial Prep', 'Spiritual Fitness', 'CAF Awareness'] }
+                    { title: 'Technical mastery', text: 'Proficiency in AFSC.', bullets: ['CDCs Completion', 'Journeyman Skill', 'Readiness Mastery', 'AFSC SME Development'] },
+                    { title: 'Warrior Ethos', text: 'Embodying Air Force culture.', bullets: ['Understand Oath', 'Core Values Daily', 'Fitness Standards', 'Professional Conduct'] }
                 ] 
             },
             { 
-                id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'Shield', 
-                steps: ['7-Level Upgrade', 'Supervisor Safety', 'NCOA', 'CCAF'], 
-                desc: 'Expert supervision and leadership.', 
+                id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'Shield', steps: ['7-Level Upgrade', 'Supervisor Safety', 'NCOA', 'CCAF'], 
+                desc: 'Expert technicians and frontline supervisors.', 
                 focusAreas: [
-                    { title: 'Frontline Lead', text: 'Leading small teams.', bullets: ['ACA Mastery', 'Subordinate Growth', 'Mission Risk'] }
+                    { title: 'Frontline Lead', text: 'Supervising small teams.', bullets: ['ACA Master', 'EPR/OPR Workflow', 'Counseling Airmen', 'Standard Enforcement'] },
+                    { title: 'Section Operations', text: 'Managing workcenter resources.', bullets: ['Risk Management', 'Resource Programming', 'Logistics Lead', 'Training Management'] }
                 ] 
             },
             { 
-                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', 
-                steps: ['SNCOA', 'SEJPME I & II', 'Senior Leadership Seminar'], 
-                desc: 'Strategic leadership and enterprise advisory.', 
+                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', steps: ['SNCOA', 'SEJPME', 'Leadership Seminar', 'Board Review'], 
+                desc: 'Strategic advisors and organizational managers.', 
                 focusAreas: [
-                    { title: 'Strategy', text: 'Advising command teams.', bullets: ['Enterprise Perspective', 'Climate Mgmt', 'Strategic Plan'] }
+                    { title: 'Strategic Vision', text: 'Advising command teams.', bullets: ['Climate Assessments', 'Change Mgmt', 'Strategic Planning', 'Policy Influencer'] },
+                    { title: 'Enterprise Mgmt', text: 'Managing state/wing assets.', bullets: ['Manpower Optimization', 'Budget Programming', 'Force Design', 'Infrastructure Ops'] }
                 ] 
             }
         ];
 
         const OFFICER_ROADMAP = [
-            { 
-                id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'Target', 
-                steps: ['OTS/Academy', 'Tech School', 'Squadron Officer School'], 
-                desc: 'Flight-level leadership and functional expertise.', 
-                focusAreas: [
-                    { title: 'Command', text: 'Leading Flights.', bullets: ['Personnel Admin', 'Mission Planning', 'Flight Morale'] }
-                ] 
-            },
-            { 
-                id: 'fgo', title: 'Field Grade', ranks: 'Maj - Lt Col', icon: 'Layers', 
-                steps: ['ACSC', 'Joint PME I', 'Squadron Command Course'], 
-                desc: 'Operational leaders and squadron command.', 
-                focusAreas: [
-                    { title: 'Command', text: 'Leading Squadrons.', bullets: ['Strategic Intent', 'Unit Discipline'] }
-                ] 
-            }
+            { id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'Target', steps: ['OTS', 'Tech School', 'SOS'], desc: 'Flight leadership.', focusAreas: [{ title: 'Command', text: 'Managing flights.', bullets: ['Personnel Wellness', 'Admin Flow', 'EPR Writing'] }] }
         ];
+
+        const CFDC_SEED = {
+            '300': { id: '300', title: 'CFDC 300', subtitle: 'Foundational Broadening', target: 'AB-SSgt / 2Lt-Capt', timeline: '3-Day Seminar', enrollmentLink: '#', overview: 'Transition to Professional Airman.', objectives: ['Mission Awareness', 'EQ', 'Writing'] },
+            '500': { id: '500', title: 'CFDC 500', subtitle: 'Operational Leadership', target: 'TSgt-MSgt / Major', timeline: '4-Day Workshop', enrollmentLink: '#', overview: 'Unit-level management.', objectives: ['ACA/EPR Mastery', 'Manpower', 'Discipline'] },
+            '700': { id: '700', title: 'CFDC 700', subtitle: 'Strategic Broadening', target: 'SMSgt-CMSgt / Lt Col - Col', timeline: '5-Day Course', enrollmentLink: '#', overview: 'Senior leadership.', objectives: ['Legislative Liaison', 'GPC Concepts', 'Strategic Messaging'] }
+        };
+
+        // --- FIREBASE INITIALIZATION ---
+        const rawFirebaseConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        const firebaseConfig = rawFirebaseConfig ? JSON.parse(rawFirebaseConfig) : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+
+        if (firebaseConfig.apiKey && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // --- COMPONENTS ---
 
@@ -252,60 +259,23 @@
             return <span ref={containerRef} className="inline-flex items-center justify-center pointer-events-none"></span>;
         };
 
-        const useProgress = (user) => {
-            const [progress, setProgress] = useState({});
-            useEffect(() => {
-                if (!user || !db) return;
-                const progressRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress');
-                const unsub = progressRef.onSnapshot((snap) => {
-                    const data = {};
-                    snap.forEach(doc => { data[doc.id] = doc.data().completed; });
-                    setProgress(data);
-                });
-                return () => unsub();
-            }, [user]);
-
-            const toggleItem = async (id) => {
-                if (!user || !db) return;
-                const itemRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid).collection('progress').doc(id);
-                await itemRef.set({ completed: !progress[id] }, { merge: true });
-            };
-
-            const getPercentage = (ids) => {
-                if (!ids || !ids.length) return 0;
-                const count = ids.filter(id => progress[id]).length;
-                return Math.round((count / ids.length) * 100);
-            };
-
-            return { progress, toggleItem, isComplete: (id) => !!progress[id], getPercentage };
-        };
-
-        // --- UI COMPONENTS ---
-        const FocusAreaCard = ({ title, text, iconName, bullets }) => {
+        const FocusAreaCard = ({ title, text, bullets }) => {
             const [flipped, setFlipped] = useState(false);
             return (
-                <div 
-                    className="group perspective-1000 h-64 w-full cursor-pointer" 
-                    onClick={() => setFlipped(!flipped)}
-                >
+                <div className="group perspective-1000 h-64 w-full cursor-pointer" onClick={() => setFlipped(!flipped)}>
                     <div className={`relative h-full w-full transition-all duration-700 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}>
                         <div className="absolute inset-0 h-full w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-6 flex flex-col items-center justify-center text-center backface-hidden z-20">
-                            <div className="bg-blue-50 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500">
-                                <Icon name={iconName || "star"} size={32} className="text-[#00308F]" />
-                            </div>
-                            <h4 className="text-lg font-black text-slate-900 mb-2 leading-tight tracking-tight">{title}</h4>
-                            <p className="text-xs text-slate-500 leading-relaxed px-4">{text}</p>
-                            <div className="mt-4 flex items-center text-[10px] font-black text-[#00308F] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                                Expand <Icon name="refresh-cw" size={10} className="ml-1" />
-                            </div>
+                            <div className="bg-blue-50 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform"><Icon name="star" size={32} className="text-[#00308F]" /></div>
+                            <h4 className="text-lg font-black text-slate-900 mb-2 leading-tight">{title}</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed">{text}</p>
                         </div>
-                        <div className="absolute inset-0 h-full w-full bg-[#00308F] rounded-3xl shadow-lg p-6 flex flex-col backface-hidden rotate-y-180 text-white overflow-hidden z-10">
-                            <h4 className="text-sm font-black mb-4 border-b border-blue-400/50 pb-2 uppercase tracking-widest">{title}</h4>
-                            <ul className="text-xs space-y-3 overflow-y-auto custom-scroll">
+                        <div className="absolute inset-0 h-full w-full bg-[#00308F] rounded-3xl shadow-lg p-6 flex flex-col backface-hidden rotate-y-180 text-white overflow-hidden z-10 text-left">
+                            <h4 className="text-sm font-black mb-4 border-b border-blue-400/50 pb-2 uppercase tracking-widest leading-none">{title}</h4>
+                            <ul className="text-[10px] space-y-2.5 overflow-y-auto custom-scroll pr-2">
                                 {bullets && bullets.map((b, i) => (
                                     <li key={i} className="flex items-start">
-                                        <Icon name="check-circle" size={12} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" />
-                                        <span className="font-medium">{b}</span>
+                                        <Icon name="check-circle" size={10} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" />
+                                        <span className="font-medium leading-tight">{b}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -315,139 +285,82 @@
             );
         };
 
-        const BookViewer = ({ book, onBack }) => (
-            <div className="animate-enter space-y-12 pb-20">
-                <button onClick={onBack} className="flex items-center text-sm font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors">
-                    <Icon name="arrow-left" size={16} className="mr-2" /> Back to Roadmap
-                </button>
-                <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                    <div className="relative z-10">
-                        <h3 className="text-5xl font-black text-white leading-none">{book.title}</h3>
-                        <p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-sm">{book.subtitle}</p>
-                    </div>
-                    <div className="absolute -right-20 -bottom-20 opacity-10">
-                        <Icon name="book" size={300} />
-                    </div>
-                </div>
+        const BookViewer = ({ book, onBack }) => {
+            const isBrown = book.title.toLowerCase().includes('brown');
+            const colorClass = isBrown ? 'bg-[#5D4037]' : 'bg-[#00308F]';
+            const accentClass = isBrown ? 'text-orange-200' : 'text-blue-200';
+            const bulletClass = isBrown ? 'bg-orange-300' : 'bg-blue-300';
 
-                <div className="grid md:grid-cols-3 gap-8">
-                    {book.sections.map((section, i) => (
-                        <div key={i} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all">
-                            <h4 className="text-xl font-black text-[#00308F] mb-4 uppercase tracking-tighter">{section.title}</h4>
-                            <p className="text-sm font-bold text-slate-400 mb-6 italic">{section.desc}</p>
-                            <div className="space-y-3">
-                                {section.items.map((item, j) => (
-                                    <div key={j} className="flex items-center text-sm font-bold text-slate-700">
-                                        <div className="w-1.5 h-1.5 bg-blue-300 rounded-full mr-3"></div>
-                                        {item}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                
-                <div className="bg-slate-900 text-white p-10 rounded-[3rem] text-center border border-white/10">
-                    <h5 className="font-black uppercase tracking-widest text-xs mb-4">Official Guidance</h5>
-                    <p className="text-slate-400 text-sm max-w-2xl mx-auto leading-relaxed">This interactive breakdown provides key themes. For legal references and full text, download the official document from the Resource Library.</p>
-                </div>
-            </div>
-        );
-
-        const HomeView = ({ onTabChange, onCategorySelect }) => (
-            <div className="space-y-16 animate-enter">
-                <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#00308F] to-[#0B1F3F] p-12 text-white shadow-2xl">
-                    <div className="relative z-10 text-center max-w-4xl mx-auto py-8">
-                        <div className="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8">
-                            <Icon name="shield" size={14} className="mr-2 text-blue-300"/> Force Development Portal
-                        </div>
-                        <h2 className="text-5xl md:text-7xl font-black mb-8 leading-[1.1] tracking-tighter uppercase text-white">FORCE DEVELOPMENT HUB</h2>
-                        <div className="flex flex-wrap justify-center gap-6">
-                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-10 py-5 rounded-2xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-widest">ENLISTED TRACK</button>
-                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-10 py-5 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-sm uppercase tracking-widest">CFDC PROGRAMS</button>
-                        </div>
-                    </div>
-                    <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12">
-                        <Icon name="shield" size={400} />
-                    </div>
-                </div>
-
-                <div className="grid lg:grid-cols-2 gap-8">
-                    {LEADERSHIP.map((leader, i) => (
-                        <div key={i} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] flex items-center shadow-sm hover:shadow-lg transition-all">
-                            <div className="w-24 h-24 rounded-[1.5rem] overflow-hidden mr-6 shadow-md border-4 border-slate-50 flex-shrink-0">
-                                <img src={leader.img} alt={leader.name} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/100'} />
-                            </div>
-                            <div>
-                                <h4 className="font-black text-slate-800 leading-tight tracking-tight">{leader.name}</h4>
-                                <p className="text-[10px] font-black text-[#00308F] uppercase tracking-widest mt-1">{leader.title}</p>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">{leader.org}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                        { label: 'Courses', icon: 'graduation-cap', tab: 'cfdc' },
-                        { label: 'Library', icon: 'book-open', tab: 'resources' },
-                        { label: 'ALQs', icon: 'target', cat: 'ALQs' },
-                        { label: 'Strategic', icon: 'globe', tab: 'strategy' },
-                    ].map((item, i) => (
-                        <button key={i} onClick={() => item.tab ? onTabChange(item.tab) : onCategorySelect(item.cat)} className="flex flex-col items-center p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all group">
-                            <div className="bg-slate-50 p-5 rounded-3xl mb-4 group-hover:bg-blue-50 transition-colors">
-                                <Icon name={item.icon} size={32} className="text-[#00308F]" />
-                            </div>
-                            <span className="font-black text-slate-900 text-[10px] uppercase tracking-widest">{item.label}</span>
-                        </button>
-                    ))}
-                </div>
-                
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 pt-12 border-t border-slate-100">
-                    {UNITS.map((unit, i) => (
-                        <a key={i} href={unit.link} target="_blank" className="flex flex-col items-center p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-blue-300 shadow-sm group transition-all">
-                            <div className="w-16 h-16 mb-4 flex items-center justify-center p-1 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform overflow-hidden">
-                                <img src={unit.img} alt={unit.name} className="max-w-full max-h-full object-contain" onError={(e) => e.target.src = 'https://via.placeholder.com/60'} />
-                            </div>
-                            <span className="font-black text-slate-700 text-[10px] uppercase tracking-widest text-center">{unit.name}</span>
-                        </a>
-                    ))}
-                </div>
-            </div>
-        );
-
-        const ResourceView = ({ resources, categoryFilter, setCategoryFilter }) => {
-            const [searchTerm, setSearchTerm] = useState('');
-            const filtered = resources.filter(r => (r.title || "").toLowerCase().includes(searchTerm.toLowerCase()) && (categoryFilter === 'All' || r.category === categoryFilter));
             return (
-                <div className="animate-enter space-y-12">
-                    <div className="flex flex-col md:flex-row justify-between border-b border-slate-100 pb-10 gap-8">
-                        <h2 className="text-3xl font-black uppercase text-slate-900 leading-none">Library</h2>
-                        <div className="relative">
-                            <Icon name="search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
-                            <input type="text" placeholder="Search resources..." className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm focus:ring-2 focus:ring-blue-100 w-full md:w-80" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/>
-                        </div>
+                <div className="animate-enter space-y-12 pb-20">
+                    <button onClick={onBack} className="flex items-center text-sm font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors"><Icon name="arrow-left" size={16} className="mr-2" /> Back</button>
+                    <div className={`${colorClass} rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden`}>
+                        <h3 className="text-5xl font-black text-white relative z-10 leading-none">{book.title}</h3>
+                        <p className={`${accentClass} font-bold uppercase mt-3 tracking-widest text-sm relative z-10`}>{book.subtitle}</p>
+                        <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12"><Icon name="book" size={300} /></div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                        {['All', 'Regulations', 'ALQs', 'Reading', 'Videos', 'Key Sites'].map(cat => (
-                            <button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${categoryFilter === cat ? 'bg-[#00308F] text-white shadow-lg' : 'bg-white border text-slate-400'}`}>{cat}</button>
-                        ))}
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filtered.map(res => (
-                            <div key={res.id} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group flex flex-col h-full">
-                                <span className="bg-blue-50 text-[#00308F] px-4 py-1.5 rounded-full text-[10px] font-black uppercase mb-4 inline-block w-fit">{res.category}</span>
-                                <h4 className="text-xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{res.title}</h4>
-                                <p className="text-xs text-slate-500 mb-6 leading-relaxed flex-grow">{res.description}</p>
-                                <a href={res.link} target="_blank" className="flex items-center text-[10px] font-black text-slate-300 uppercase hover:text-[#00308F] transition-colors">
-                                    Open Asset <Icon name="external-link" size={12} className="ml-2" />
-                                </a>
+                    <div className="grid lg:grid-cols-1 gap-12">
+                        {book.sections.map((section, i) => (
+                            <div key={i} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm">
+                                <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 leading-none">{section.title}</h4>
+                                <p className="text-slate-500 font-bold mb-8 italic">"{section.desc}"</p>
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {section.subsections.map((sub, j) => (
+                                        <div key={j} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                                            <h5 className={`font-black uppercase text-xs tracking-widest mb-3 leading-none ${isBrown ? 'text-[#5D4037]' : 'text-[#00308F]'}`}>{sub.name}</h5>
+                                            <p className="text-[10px] text-slate-400 font-bold mb-4 leading-relaxed uppercase">{sub.detail}</p>
+                                            <div className="space-y-2">
+                                                {sub.items.map((item, k) => (<div key={k} className="flex items-center text-[10px] font-black text-slate-700 uppercase tracking-wider leading-tight"><div className={`w-1 h-1 rounded-full mr-2 ${bulletClass}`}></div>{item}</div>))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
             );
         };
+
+        const HomeView = ({ onTabChange, onCategorySelect }) => (
+            <div className="space-y-16 animate-enter">
+                <div className="relative overflow-hidden rounded-[3.5rem] bg-gradient-to-br from-[#00308F] to-[#0B1F3F] p-12 md:p-20 text-white shadow-2xl text-center">
+                    <div className="relative z-10 max-w-4xl mx-auto">
+                        <div className="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8"><Icon name="shield" size={14} className="mr-2 text-blue-300"/> Force Development Hub</div>
+                        <h2 className="text-5xl md:text-8xl font-black mb-10 tracking-tighter uppercase text-white drop-shadow-sm leading-none">FORCE DEVELOPMENT HUB</h2>
+                        <div className="flex flex-wrap justify-center gap-6">
+                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-widest">ENLISTED TRACK</button>
+                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-12 py-5 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-sm uppercase tracking-widest">CFDC PROGRAMS</button>
+                        </div>
+                    </div>
+                    <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12"><Icon name="shield" size={400} /></div>
+                </div>
+                <div className="grid lg:grid-cols-2 gap-8">
+                    {LEADERSHIP.map((leader, i) => (
+                        <div key={i} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] flex items-center shadow-sm hover:shadow-lg transition-all">
+                            <div className="w-24 h-24 rounded-[1.5rem] overflow-hidden mr-6 shadow-md border-4 border-slate-50 flex-shrink-0"><img src={leader.img} alt={leader.name} className="w-full h-full object-cover" /></div>
+                            <div><h4 className="font-black text-slate-800 leading-tight tracking-tight">{leader.name}</h4><p className="text-[10px] font-black text-[#00308F] uppercase tracking-widest mt-1">{leader.title}</p><p className="text-[10px] text-slate-400 font-bold uppercase mt-0.5">{leader.org}</p></div>
+                        </div>
+                    ))}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[{ label: 'Courses', icon: 'graduation-cap', tab: 'cfdc' }, { label: 'Library', icon: 'library', tab: 'resources' }, { label: 'ALQs', icon: 'target', cat: 'ALQs' }, { label: 'Strategic', icon: 'globe', tab: 'strategy' }].map((item, i) => (
+                        <button key={i} onClick={() => item.tab ? onTabChange(item.tab) : onCategorySelect(item.cat)} className="flex flex-col items-center p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all group">
+                            <div className="bg-slate-50 p-5 rounded-3xl mb-4 group-hover:bg-blue-50 transition-colors"><Icon name={item.icon} size={32} className="text-[#00308F]" /></div>
+                            <span className="font-black text-slate-900 text-[10px] uppercase tracking-widest">{item.label}</span>
+                        </button>
+                    ))}
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 pt-12 border-t border-slate-100">
+                    {UNITS.map((unit, i) => (
+                        <a key={i} href={unit.link} target="_blank" className="flex flex-col items-center p-6 bg-white border border-slate-100 rounded-[2.5rem] hover:border-blue-300 shadow-sm group transition-all">
+                            <div className="w-16 h-16 mb-4 flex items-center justify-center p-1 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform overflow-hidden"><img src={unit.img} alt={unit.name} className="max-w-full max-h-full object-contain" /></div>
+                            <span className="font-black text-slate-700 text-[10px] uppercase tracking-widest text-center leading-tight">{unit.name}</span>
+                        </a>
+                    ))}
+                </div>
+            </div>
+        );
 
         const CFDCView = ({ courses }) => {
             const [selectedId, setSelectedId] = useState(null);
@@ -456,35 +369,8 @@
                 return (
                     <div className="animate-enter space-y-8">
                         <button onClick={() => setSelectedId(null)} className="flex items-center text-sm font-black text-slate-400 uppercase tracking-widest"><Icon name="arrow-left" size={16} className="mr-2" /> Catalog</button>
-                        <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
-                            <div className="relative z-10">
-                                <h3 className="text-5xl font-black text-white leading-none">{course.title}</h3>
-                                <p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-sm">{course.subtitle}</p>
-                                <div className="mt-8 flex flex-wrap gap-4">
-                                    <div className="bg-white/10 px-4 py-2 rounded-xl text-xs font-bold border border-white/20 uppercase tracking-widest">Target: {course.target}</div>
-                                    <div className="bg-white/10 px-4 py-2 rounded-xl text-xs font-bold border border-white/20 uppercase tracking-widest">Length: {course.timeline}</div>
-                                </div>
-                                <a href={course.enrollmentLink} target="_blank" className="mt-12 inline-block bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black uppercase text-xs shadow-xl hover:scale-105 transition-all tracking-widest">Enrollment Portal</a>
-                            </div>
-                            <div className="absolute -right-20 -bottom-20 opacity-5">
-                                <Icon name="shield" size={300} />
-                            </div>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-12 mt-12">
-                            <div className="space-y-6">
-                                <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b pb-2">Learning Objectives</h4>
-                                {(course.objectives || []).map((obj, i) => (
-                                    <div key={i} className="flex items-start bg-white p-5 rounded-3xl border border-slate-100 shadow-sm font-bold text-slate-700">
-                                        <Icon name="check-circle" className="text-green-500 mr-4 flex-shrink-0" size={18} />
-                                        {obj}
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="bg-slate-50 p-10 rounded-[3rem] space-y-6">
-                                <h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b border-slate-200 pb-2">Course Overview</h4>
-                                <p className="text-slate-600 leading-relaxed font-medium">{course.overview}</p>
-                            </div>
-                        </div>
+                        <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden"><h3 className="text-5xl font-black text-white relative z-10 leading-none">{course.title}</h3><p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-sm relative z-10">{course.subtitle}</p><a href={course.enrollmentLink} target="_blank" className="mt-12 inline-block bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black uppercase text-xs shadow-xl hover:scale-105 transition-all relative z-10 tracking-widest">Enrollment Portal</a><div className="absolute -right-20 -bottom-20 opacity-5"><Icon name="shield" size={300} /></div></div>
+                        <div className="grid md:grid-cols-2 gap-12 mt-12"><div className="space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b pb-2">Learning Objectives</h4>{(course.objectives || []).map((obj, i) => (<div key={i} className="flex items-start bg-white p-5 rounded-3xl border border-slate-100 shadow-sm font-bold text-slate-700"><Icon name="check-circle" className="text-green-500 mr-4 flex-shrink-0" size={18} />{obj}</div>))}</div><div className="bg-slate-50 p-10 rounded-[3rem] space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b border-slate-200 pb-2">Overview</h4><p className="text-slate-600 leading-relaxed font-medium">{course.overview}</p></div></div>
                     </div>
                 );
             }
@@ -495,15 +381,8 @@
                         {['300', '500', '700'].map(id => (
                             <div key={id} onClick={() => setSelectedId(id)} className="bg-white border border-slate-100 rounded-[2.5rem] p-10 hover:shadow-2xl transition-all cursor-pointer group relative overflow-hidden flex flex-col min-h-[350px]">
                                 <div className="text-7xl font-black text-slate-50 absolute -right-2 -top-2 select-none">#{id}</div>
-                                <div className="relative z-10">
-                                    <h4 className="text-3xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{courses[id]?.title || `CFDC ${id}`}</h4>
-                                    <p className="text-[10px] font-black text-[#00308F] uppercase mt-2 tracking-widest">{courses[id]?.subtitle}</p>
-                                    <div className="mt-8 bg-slate-50 px-4 py-1.5 rounded-lg text-[10px] font-black text-slate-400 uppercase w-fit tracking-widest">{courses[id]?.target}</div>
-                                    <p className="text-sm text-slate-500 mt-6 leading-relaxed line-clamp-4 font-medium">{courses[id]?.overview}</p>
-                                </div>
-                                <div className="mt-auto pt-8 flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-[#00308F]">
-                                    Details <Icon name="chevron-right" size={14} className="ml-2" />
-                                </div>
+                                <div className="relative z-10"><h4 className="text-3xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{courses[id]?.title || `CFDC ${id}`}</h4><p className="text-[10px] font-black text-[#00308F] uppercase mt-2 tracking-widest">{courses[id]?.subtitle}</p><div className="mt-8 bg-slate-50 px-4 py-1.5 rounded-lg text-[10px] font-black text-slate-400 uppercase w-fit tracking-widest">{courses[id]?.target}</div><p className="text-sm text-slate-500 mt-6 leading-relaxed line-clamp-4 font-medium">{courses[id]?.overview}</p></div>
+                                <div className="mt-auto pt-8 flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-[#00308F]">Details <Icon name="chevron-right" size={14} className="ml-2" /></div>
                             </div>
                         ))}
                     </div>
@@ -516,18 +395,11 @@
             const [error, setError] = useState(false);
             const handleSubmit = (e) => {
                 e.preventDefault();
-                if (pass === ADMIN_PASSWORD) { onLogin(); } else { setError(true); }
+                if (pass === ADMIN_PASSWORD) onLogin(); else setError(true);
             };
             return (
                 <div className="animate-enter max-w-md mx-auto py-20 px-4">
-                    <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100 text-center">
-                        <div className="bg-slate-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"><Icon name="lock" size={32} className="text-[#00308F]" /></div>
-                        <h3 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight">Admin Gate</h3>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <input type="password" className={`w-full p-5 bg-slate-50 border rounded-2xl font-bold focus:ring-4 outline-none transition-all ${error ? 'border-red-500 ring-red-50' : 'border-slate-100 ring-blue-50'}`} placeholder="Admin Key" value={pass} onChange={e => { setPass(e.target.value); setError(false); }} autoFocus />
-                            <button className="w-full bg-[#00308F] text-white py-5 rounded-2xl font-black uppercase text-xs shadow-xl tracking-widest">Authenticate</button>
-                        </form>
-                    </div>
+                    <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100 text-center"><div className="bg-slate-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"><Icon name="lock" size={32} className="text-[#00308F]" /></div><h3 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight text-[#00308F]">Admin Portal</h3><form onSubmit={handleSubmit} className="space-y-4"><input type="password" className={`w-full p-5 bg-slate-50 border rounded-2xl font-bold focus:ring-4 outline-none transition-all ${error ? 'border-red-500' : 'border-slate-100'}`} placeholder="Admin Key" value={pass} onChange={e => { setPass(e.target.value); setError(false); }} autoFocus /><button className="w-full bg-[#00308F] text-white py-5 rounded-2xl font-black uppercase text-xs shadow-xl">Authenticate</button></form></div>
                 </div>
             );
         };
@@ -537,119 +409,78 @@
             const handleSave = async (e) => {
                 e.preventDefault();
                 if (!db) return;
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('resources').add({ ...form, dateAdded: new Date().toISOString() });
+                await db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').add({ ...form, dateAdded: new Date().toISOString() });
                 setForm({ title: '', category: '', description: '', link: '' });
             };
             return (
                 <div className="animate-enter grid lg:grid-cols-3 gap-12">
-                    <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl">
-                        <h3 className="font-black mb-6 uppercase text-sm text-slate-900 tracking-widest">Add Entry</h3>
-                        <form onSubmit={handleSave} className="space-y-4">
-                            <input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" placeholder="Title" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-                            <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" value={form.category} onChange={e => setForm({...form, category: e.target.value})} required>
-                                <option value="">Category</option>
-                                <option value="Regulations">Regulations</option>
-                                <option value="ALQs">ALQs</option>
-                                <option value="Reading">Reading</option>
-                                <option value="Videos">Videos</option>
-                            </select>
-                            <textarea className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm h-32 outline-none" placeholder="Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} required />
-                            <input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" placeholder="URL" value={form.link} onChange={e => setForm({...form, link: e.target.value})} required />
-                            <button className="w-full bg-[#00308F] text-white py-4 rounded-2xl font-black uppercase text-xs shadow-xl tracking-widest">Push Update</button>
-                        </form>
+                    <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl"><h3 className="font-black mb-6 uppercase text-sm text-slate-900 tracking-widest">Add Entry</h3><form onSubmit={handleSave} className="space-y-4"><input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" placeholder="Title" value={form.title} onChange={e => setForm({...form, title: e.target.value})} required /><select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" value={form.category} onChange={e => setForm({...form, category: e.target.value})} required><option value="">Category</option><option value="Regulations">Regulations</option><option value="ALQs">ALQs</option><option value="Reading">Reading</option></select><textarea className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm h-32 outline-none" placeholder="Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} required /><input className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-sm outline-none" placeholder="URL" value={form.link} onChange={e => setForm({...form, link: e.target.value})} required /><button className="w-full bg-[#00308F] text-white py-4 rounded-2xl font-black uppercase text-xs shadow-xl tracking-widest">Push Update</button></form></div>
+                    <div className="lg:col-span-2 space-y-4">{resources.map(res => (<div key={res.id} className="bg-white p-6 border border-slate-100 rounded-[1.5rem] flex justify-between items-center shadow-sm"><div><h4 className="font-black text-slate-800 tracking-tight leading-none">{res.title}</h4><span className="text-[10px] uppercase text-blue-600 font-black tracking-widest mt-2 block">{res.category}</span></div><button onClick={() => db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').doc(res.id).delete()} className="text-slate-200 hover:text-red-500 transition-colors"><Icon name="trash-2" size={18}/></button></div>))}</div>
+                </div>
+            );
+        };
+
+        const ResourceView = ({ resources, categoryFilter, setCategoryFilter }) => {
+            const [searchTerm, setSearchTerm] = useState('');
+            const filtered = resources.filter(r => (r.title || "").toLowerCase().includes(searchTerm.toLowerCase()) && (categoryFilter === 'All' || r.category === categoryFilter));
+            return (
+                <div className="animate-enter space-y-12">
+                    <div className="flex flex-col md:flex-row justify-between border-b border-slate-100 pb-10 gap-8">
+                        <h2 className="text-3xl font-black uppercase text-slate-900 leading-none tracking-tight">Library</h2>
+                        <div className="relative"><Icon name="search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" /><input type="text" placeholder="Search..." className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm focus:ring-2 focus:ring-blue-100 w-full md:w-80 transition-all" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/></div>
                     </div>
-                    <div className="lg:col-span-2 space-y-4">
-                        <h3 className="font-black mb-4 uppercase text-xs text-slate-400 tracking-widest px-2">Records Management</h3>
-                        {resources.map(res => (
-                            <div key={res.id} className="bg-white p-6 border border-slate-100 rounded-[1.5rem] flex justify-between items-center shadow-sm">
-                                <div><h4 className="font-black text-slate-800 tracking-tight">{res.title}</h4><span className="text-[10px] uppercase text-blue-600 font-black tracking-widest">{res.category}</span></div>
-                                <button onClick={() => db.collection('artifacts').doc(appId).collection('public').doc('data').collection('resources').doc(res.id).delete()} className="text-slate-200 hover:text-red-500 transition-colors"><Icon name="trash-2" size={18}/></button>
-                            </div>
-                        ))}
+                    <div className="flex flex-wrap gap-2">
+                        {['All', 'Regulations', 'ALQs', 'Reading', 'Videos'].map(cat => (<button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${categoryFilter === cat ? 'bg-[#00308F] text-white shadow-lg' : 'bg-white border text-slate-400'}`}>{cat}</button>))}
+                    </div>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {filtered.map(res => (<div key={res.id} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group flex flex-col h-full"><span className="bg-blue-50 text-[#00308F] px-4 py-1.5 rounded-full text-[10px] font-black uppercase mb-4 inline-block w-fit">{res.category}</span><h4 className="text-xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{res.title}</h4><p className="text-xs text-slate-500 mb-6 leading-relaxed flex-grow">{res.description}</p><a href={res.link} target="_blank" className="flex items-center text-[10px] font-black text-slate-300 uppercase hover:text-[#00308F]">Open Asset <Icon name="external-link" size={12} className="ml-2" /></a></div>))}
                     </div>
                 </div>
             );
         };
 
-        const RoadmapView = ({ data, title, userProgress, books }) => {
-            const [expanded, setExpanded] = useState(0);
-            const [selectedBook, setSelectedBook] = useState(null);
+        const RoadmapView = ({ data, title, userProgress, books, selectedBook, setSelectedBook, expandedTier, setExpandedTier }) => {
             const { toggleItem, isComplete, getPercentage } = userProgress;
-
-            if (selectedBook) {
-                return <BookViewer book={BOOK_CONTENT[selectedBook]} onBack={() => setSelectedBook(null)} />;
-            }
+            if (selectedBook) { return <BookViewer book={BOOK_CONTENT[selectedBook]} onBack={() => setSelectedBook(null)} />; }
 
             return (
                 <div className="animate-enter space-y-12">
                     <h2 className="text-4xl font-black text-center text-slate-900 tracking-tighter uppercase border-b border-slate-100 pb-12 leading-none">{title}</h2>
-                    
                     {books && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                            <button onClick={() => setSelectedBook('blue')} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col items-center hover:shadow-2xl hover:border-blue-200 transition-all group">
-                                <div className="w-32 h-44 mb-6 rounded-md shadow-xl overflow-hidden group-hover:scale-105 transition-transform border border-slate-100">
-                                    <img src={IMAGES.blueBook} alt="Blue Book" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/128x176?text=Blue+Book'} />
-                                </div>
-                                <h3 className="font-black text-slate-900 text-xs uppercase tracking-[0.2em]">The Blue Book</h3>
-                                <div className="mt-4 flex items-center text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">Interactive View <Icon name="chevron-right" size={10} className="ml-1" /></div>
-                            </button>
-                            <button onClick={() => setSelectedBook('brown')} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col items-center hover:shadow-2xl hover:border-blue-200 transition-all group">
-                                <div className="w-32 h-44 mb-6 rounded-md shadow-xl overflow-hidden group-hover:scale-105 transition-transform border border-slate-100">
-                                    <img src={IMAGES.brownBook} alt="Brown Book" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/128x176?text=Brown+Book'} />
-                                </div>
-                                <h3 className="font-black text-slate-900 text-xs uppercase tracking-[0.2em]">The Brown Book</h3>
-                                <div className="mt-4 flex items-center text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">Interactive View <Icon name="chevron-right" size={10} className="ml-1" /></div>
-                            </button>
-                            <button onClick={() => setSelectedBook('blueprint')} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex flex-col items-center hover:shadow-2xl hover:border-blue-200 transition-all group">
-                                <div className="w-32 h-44 mb-6 rounded-md shadow-xl overflow-hidden group-hover:scale-105 transition-transform border border-slate-100">
-                                    <img src={IMAGES.blueprint} alt="Blueprint" className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/128x176?text=Blueprint'} />
-                                </div>
-                                <h3 className="font-black text-slate-900 text-xs uppercase tracking-[0.2em]">The Blueprint</h3>
-                                <div className="mt-4 flex items-center text-[10px] font-black text-blue-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">Interactive View <Icon name="chevron-right" size={10} className="ml-1" /></div>
-                            </button>
+                            {Object.entries({blue: IMAGES.blueBook, brown: IMAGES.brownBook, blueprint: IMAGES.blueprint}).map(([key, img]) => {
+                                const isBrown = key === 'brown';
+                                return (
+                                    <button key={key} onClick={() => setSelectedBook(key)} className={`${isBrown ? 'bg-[#5D4037] border-[#8D6E63]' : 'bg-white border-slate-100'} border p-8 rounded-[3rem] flex flex-col items-center hover:shadow-2xl transition-all group`}>
+                                        <div className="w-32 h-44 mb-6 rounded-md shadow-xl overflow-hidden group-hover:scale-105 transition-transform border border-slate-100/20"><img src={img} alt={key} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/128x176'} /></div>
+                                        <h3 className={`font-black text-xs uppercase tracking-[0.2em] ${isBrown ? 'text-white' : 'text-slate-900'}`}>The {key.charAt(0).toUpperCase() + key.slice(1)} Book</h3>
+                                        <div className={`mt-4 flex items-center text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all ${isBrown ? 'text-orange-200' : 'text-blue-400'}`}>Interactive View <Icon name="chevron-right" size={10} className="ml-1" /></div>
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
-
                     <div className="space-y-12 relative">
                         <div className="absolute left-10 top-0 bottom-0 w-1 bg-slate-200/50 rounded-full"></div>
                         {data.map((tier, i) => {
-                            const isOpen = expanded === i;
+                            const isOpen = expandedTier === i;
                             const pct = getPercentage(tier.steps.map(s => `${tier.id}-${s}`));
                             return (
                                 <div key={i} className="relative pl-24">
-                                    <div onClick={() => setExpanded(isOpen ? null : i)} className={`absolute left-0 top-0 w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-2xl border-8 border-white z-10 cursor-pointer transition-all ${isOpen ? 'bg-[#00308F] text-white scale-110' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>
-                                        <Icon name={tier.icon} size={32} />
-                                    </div>
+                                    <div onClick={() => setExpandedTier(isOpen ? null : i)} className={`absolute left-0 top-0 w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-2xl border-8 border-white z-10 cursor-pointer transition-all ${isOpen ? 'bg-[#00308F] text-white scale-110' : 'bg-slate-100 text-slate-400'}`}><Icon name={tier.icon} size={32} /></div>
                                     <div className={`rounded-[3rem] border bg-white transition-all overflow-hidden ${isOpen ? 'border-[#00308F] shadow-2xl' : 'border-slate-100 shadow-sm'}`}>
-                                        <div onClick={() => setExpanded(isOpen ? null : i)} className="p-8 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
-                                            <div><h4 className="text-2xl font-black text-slate-900 leading-tight">{tier.title}</h4><p className="text-[10px] font-black text-[#00308F] uppercase mt-1 tracking-widest">{tier.ranks}</p></div>
-                                            <div className="text-right">
-                                                <div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-1">Tier Progress</div>
-                                                <div className="font-black text-slate-900 text-xl leading-none">{pct}%</div>
-                                            </div>
+                                        <div onClick={() => setExpandedTier(isOpen ? null : i)} className="p-8 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+                                            <div><h4 className="text-2xl font-black text-slate-900 leading-tight tracking-tight">{tier.title}</h4><p className="text-[10px] font-black text-[#00308F] uppercase mt-1 tracking-widest">{tier.ranks}</p></div>
+                                            <div className="text-right"><div className="text-[10px] font-bold text-slate-300 uppercase tracking-widest mb-1 text-xs text-right">Progress</div><div className="font-black text-slate-900 text-xl leading-none">{pct}%</div></div>
                                         </div>
                                         {isOpen && (
                                             <div className="p-10 bg-slate-50/50 animate-enter border-t border-slate-100">
                                                 <div className="grid md:grid-cols-2 gap-10">
-                                                    <div>
-                                                        <h5 className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-6">Track Milestones</h5>
-                                                        {tier.steps.map((step, j) => {
-                                                            const id = `${tier.id}-${step}`;
-                                                            const done = isComplete(id);
-                                                            return (
-                                                                <div key={j} onClick={() => toggleItem(id)} className={`flex items-center p-4 rounded-2xl border-2 mb-2 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100 shadow-sm hover:border-blue-200'}`}>
-                                                                    <div className={`w-6 h-6 rounded-lg mr-4 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={14}/>}</div>
-                                                                    <span className={`font-bold text-sm ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                    <div className="grid gap-4 content-start">
-                                                        <h5 className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-2">Development Focus</h5>
-                                                        {tier.focusAreas.map((f, j) => (
-                                                            <FocusAreaCard key={j} title={f.title} text={f.text} bullets={f.bullets} />
-                                                        ))}
-                                                    </div>
+                                                    <div><h5 className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-6 text-left">Track Milestones</h5>{tier.steps.map((step, j) => {
+                                                        const id = `${tier.id}-${step}`; const done = isComplete(id);
+                                                        return (<div key={j} onClick={() => toggleItem(id)} className={`flex items-center p-4 rounded-2xl border-2 mb-2 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100'}`}><div className={`w-6 h-6 rounded-lg mr-4 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={14}/>}</div><span className={`font-bold text-sm ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span></div>);
+                                                    })}</div>
+                                                    <div className="grid gap-4 content-start"><h5 className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-2 text-left">Development Focus Areas</h5>{tier.focusAreas.map((f, j) => (<FocusAreaCard key={j} title={f.title} text={f.text} bullets={f.bullets} />))}</div>
                                                 </div>
                                             </div>
                                         )}
@@ -670,118 +501,78 @@
             const [categoryFilter, setCategoryFilter] = useState('All');
             const [isAdminAuth, setIsAdminAuth] = useState(false);
             const [mobileOpen, setMobileOpen] = useState(false);
+            const [expandedTier, setExpandedTier] = useState(0);
+            const [selectedBook, setSelectedBook] = useState(null);
 
             useEffect(() => {
+                if (!auth) return;
                 const initAuth = async () => {
+                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                     try {
-                        const token = typeof __initial_auth_token !== 'undefined' && __initial_auth_token ? __initial_auth_token : null;
-                        if (auth) {
-                            if (token) { await auth.signInWithCustomToken(token); }
-                            else { await auth.signInAnonymously(); }
-                        }
+                        if (token) await auth.signInWithCustomToken(token);
+                        else await auth.signInAnonymously();
+                        auth.onAuthStateChanged(setUser);
                     } catch (e) { console.error("Auth error", e); }
                 };
                 initAuth();
-                if (auth) return auth.onAuthStateChanged(setUser);
             }, []);
 
             useEffect(() => {
                 if (!user || !db) return;
-                const unsubRes = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('resources')
-                    .onSnapshot(snap => {
-                        const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); setResources(list);
-                    });
-                const unsubCourses = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('courses')
-                    .onSnapshot(snap => {
+                const unsubRes = db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').onSnapshot(snap => { const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); setResources(list); }, err => console.error(err));
+                const unsubCourses = db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('courses').onSnapshot(snap => {
                         const data = {}; snap.forEach(d => data[d.id] = d.data());
-                        if (Object.keys(data).length === 0) {
-                            Object.keys(CFDC_SEED).forEach(id => db.collection('artifacts').doc(appId).collection('public').doc('data').collection('courses').doc(id).set(CFDC_SEED[id]));
-                        } else { setCourses(data); }
-                    });
+                        if (Object.keys(data).length === 0) { Object.keys(CFDC_SEED).forEach(id => db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('courses').doc(id).set(CFDC_SEED[id])); } else { setCourses(data); }
+                    }, err => console.error(err));
                 return () => { unsubRes(); unsubCourses(); };
             }, [user]);
 
-            const userProgress = useProgress(user);
+            const useProgressHook = (user) => {
+                const [progress, setProgress] = useState({});
+                useEffect(() => {
+                    if (!user || !db) return;
+                    const unsub = db.collection('artifacts').doc(firebaseAppId).collection('users').doc(user.uid).collection('progress').onSnapshot((snap) => {
+                        const data = {}; snap.forEach(doc => { data[doc.id] = doc.data().completed; }); setProgress(data);
+                    });
+                    return () => unsub();
+                }, [user]);
+                const toggleItem = async (id) => {
+                    if (!user || !db) return;
+                    await db.collection('artifacts').doc(firebaseAppId).collection('users').doc(user.uid).collection('progress').doc(id).set({ completed: !progress[id] }, { merge: true });
+                };
+                const getPercentage = (ids) => {
+                    if (!ids || !ids.length) return 0;
+                    const count = ids.filter(id => progress[id]).length;
+                    return Math.round((count / ids.length) * 100);
+                };
+                return { progress, toggleItem, isComplete: (id) => !!progress[id], getPercentage };
+            };
 
-            const navItems = [
-                { id: 'home', label: 'Hub' }, 
-                { id: 'enlisted', label: 'Enlisted' }, 
-                { id: 'officer', label: 'Officer' },
-                { id: 'cfdc', label: 'Courses' }, 
-                { id: 'resources', label: 'Library' }, 
-                { id: 'admin', label: 'Admin' }
-            ];
+            const userProgress = useProgressHook(user);
+            const navItems = [{ id: 'home', label: 'Hub' }, { id: 'enlisted', label: 'Enlisted' }, { id: 'officer', label: 'Officer' }, { id: 'cfdc', label: 'Courses' }, { id: 'resources', label: 'Library' }, { id: 'admin', label: 'Admin' }];
 
             return (
-                <div className="flex flex-col min-h-screen selection:bg-[#00308F] selection:text-white bg-slate-50">
+                <div className="flex flex-col min-h-screen selection:bg-[#00308F] selection:text-white bg-slate-50 font-sans">
                     <header className="glass-header border-b h-24 flex items-center sticky top-0 z-50 shadow-sm">
-                        <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center">
-                            <div className="flex items-center space-x-5 cursor-pointer group" onClick={() => setActiveTab('home')}>
-                                <div className="bg-[#00308F] p-3 rounded-2xl shadow-xl text-white transition-all group-hover:scale-110 group-hover:rotate-6 overflow-hidden w-12 h-12 flex items-center justify-center">
-                                    <img src={IMAGES.logo} alt="Logo" className="max-w-full max-h-full object-contain" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <h1 className="font-black text-2xl uppercase tracking-tighter text-slate-900 leading-none">CA ANG</h1>
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00308F] mt-1 opacity-60">Development</span>
-                                </div>
+                        <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center h-full">
+                            <div className="flex items-center space-x-5 cursor-pointer group h-full" onClick={() => setActiveTab('home')}>
+                                <div className="bg-[#00308F] p-3 rounded-2xl shadow-xl text-white transition-all group-hover:scale-110 overflow-hidden w-12 h-12 flex items-center justify-center"><img src={IMAGES.logo} alt="Logo" className="max-w-full max-h-full object-contain" /></div>
+                                <div className="flex flex-col"><h1 className="font-black text-2xl uppercase tracking-tighter text-slate-900 leading-none">CA ANG</h1><span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#00308F] mt-1 opacity-60">Force Development Hub</span></div>
                             </div>
-                            <nav className="hidden lg:flex space-x-1">
-                                {navItems.map(item => (
-                                    <button 
-                                        key={item.id} 
-                                        onClick={() => { setActiveTab(item.id); setCategoryFilter('All'); setMobileOpen(false); }} 
-                                        className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] transition-all 
-                                            ${activeTab === item.id 
-                                                ? 'bg-[#00308F] text-white shadow-2xl translate-y-[-2px]' 
-                                                : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </nav>
-                            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-3 text-slate-400 hover:text-[#00308F] transition-colors">
-                                <Icon name={mobileOpen ? "x" : "menu"} size={28} />
-                            </button>
+                            <nav className="hidden lg:flex space-x-1">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setCategoryFilter('All'); setMobileOpen(false); }} className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.15em] transition-all ${activeTab === item.id ? 'bg-[#00308F] text-white shadow-2xl translate-y-[-2px]' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}>{item.label}</button>))}</nav>
+                            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-3 text-slate-400"><Icon name={mobileOpen ? "x" : "menu"} size={28} /></button>
                         </div>
-                        {mobileOpen && (
-                            <div className="lg:hidden absolute top-24 left-0 w-full bg-white border-b shadow-2xl animate-enter z-50 p-6 flex flex-col gap-2">
-                                {navItems.map(item => (
-                                    <button 
-                                        key={item.id} 
-                                        onClick={() => { setActiveTab(item.id); setMobileOpen(false); }} 
-                                        className={`w-full text-left p-5 rounded-2xl font-black uppercase tracking-widest text-xs ${activeTab === item.id ? 'bg-[#00308F] text-white' : 'bg-slate-50 text-slate-400'}`}
-                                    >
-                                        {item.label}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        {mobileOpen && (<div className="lg:hidden absolute top-24 left-0 w-full bg-white border-b shadow-2xl animate-enter z-50 p-6 flex flex-col gap-2">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setMobileOpen(false); }} className={`w-full text-left p-5 rounded-2xl font-black uppercase tracking-widest text-xs ${activeTab === item.id ? 'bg-[#00308F] text-white' : 'bg-slate-50 text-slate-400'}`}>{item.label}</button>))}</div>)}
                     </header>
-                    
                     <main className="flex-grow max-w-7xl mx-auto w-full p-4 md:p-12">
-                        {activeTab === 'home' && <HomeView onTabChange={setActiveTab} onCategorySelect={(c) => { setCategoryFilter(c); setActiveTab('resources'); }} units={UNITS} />}
-                        {activeTab === 'enlisted' && <RoadmapView data={ENLISTED_ROADMAP} title="Enlisted Continuum" type="enlisted" userProgress={userProgress} books={true} />}
+                        {activeTab === 'home' && <HomeView onTabChange={setActiveTab} onCategorySelect={(c) => { setCategoryFilter(c); setActiveTab('resources'); }} />}
+                        {activeTab === 'enlisted' && <RoadmapView data={ENLISTED_ROADMAP} title="Enlisted Continuum" type="enlisted" userProgress={userProgress} books={true} selectedBook={selectedBook} setSelectedBook={setSelectedBook} expandedTier={expandedTier} setExpandedTier={setExpandedTier} />}
                         {activeTab === 'officer' && <RoadmapView data={OFFICER_ROADMAP} title="Officer Continuum" type="officer" userProgress={userProgress} />}
-                        {activeTab === 'resources' && <ResourceView resources={resources} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
                         {activeTab === 'cfdc' && <CFDCView courses={courses} />}
-                        {activeTab === 'admin' && (
-                            isAdminAuth ? <AdminView resources={resources} /> : <AdminLogin onLogin={() => setIsAdminAuth(true)} />
-                        )}
-                        {activeTab === 'strategy' && (
-                            <div className="bg-[#1F2937] text-white p-12 rounded-[3rem] shadow-2xl animate-enter relative overflow-hidden">
-                                <h3 className="text-3xl font-black uppercase flex items-center tracking-tighter"><Icon name="globe" size={32} className="text-yellow-400 mr-4" /> Strategic Context</h3>
-                                <p className="text-slate-400 font-medium mt-6 text-lg leading-relaxed max-w-2xl uppercase tracking-widest">Unclassified resources for GPC and national defense alignment.</p>
-                                <Icon name="shield" size={400} className="absolute -right-20 -bottom-20 opacity-5" />
-                            </div>
-                        )}
+                        {activeTab === 'resources' && <ResourceView resources={resources} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
+                        {activeTab === 'admin' && (isAdminAuth ? <AdminView resources={resources} /> : <AdminLogin onLogin={() => setIsAdminAuth(true)} />)}
                     </main>
-
-                    <footer className="bg-slate-900 text-slate-500 py-24 border-t-8 border-[#00308F]">
-                        <div className="max-w-7xl mx-auto px-4 text-center">
-                            <Icon name="shield" size={48} className="mx-auto mb-6 opacity-20" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Integrity First • Service Before Self • Excellence In All We Do</p>
-                        </div>
-                    </footer>
+                    <footer className="bg-slate-900 text-slate-500 py-24 border-t-8 border-[#00308F]"><div className="max-w-7xl mx-auto px-4 text-center"><Icon name="shield" size={48} className="mx-auto mb-6 opacity-20" /><p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Integrity First • Service Before Self • Excellence In All We Do</p></div></footer>
                 </div>
             );
         }
