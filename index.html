@@ -78,55 +78,39 @@
             { name: 'Chief Master Sergeant Seth M. Zweben', title: 'State Command Chief', org: 'California Air National Guard', img: IMAGES.chief }
         ];
 
-        // --- COMPREHENSIVE DATA STRUCTURES ---
-        
+        // --- COMPREHENSIVE DATA ---
         const CFDC_SEED = {
             '300': {
-                id: '300',
-                title: 'CFDC 300',
-                subtitle: 'Foundational Development',
-                target: 'AB - SSgt & 2Lt - Capt',
-                timeline: '3-Day In-Residence Seminar',
-                enrollmentLink: '#',
-                overview: 'The CFDC 300 focuses on the transition from a technician to a professional Airman. Emphasis is placed on CA ANG heritage, the dual-mission environment (State and Federal), and the development of interpersonal communication skills. This course establishes the character foundation required for a long-term career in the Profession of Arms.',
+                id: '300', title: 'CFDC 300', subtitle: 'Foundational Development', target: 'AB - SSgt & 2Lt - Capt', timeline: '3-Day Seminar', enrollmentLink: '#',
+                overview: 'Focuses on the transition from technician to professional Airman. Emphasis on CA ANG heritage, the dual-mission environment, and interpersonal communication.',
                 objectives: [
-                    'Analyze the Airman’s Creed and Oath of Enlistment in a modern California context.',
-                    'Examine CA ANG heritage and Wing-specific lineages.',
-                    'Develop Emotional Intelligence (EQ) and self-awareness for team integration.',
-                    'Master the fundamentals of professional military writing and briefing standards.',
-                    'Differentiate between Title 32 State and Title 10 Federal mission sets.'
+                    'Analyze the Airman’s Creed and Oath in a California context.',
+                    'Examine CA ANG heritage and Wing lineages.',
+                    'Develop Emotional Intelligence for team integration.',
+                    'Master professional military writing and briefing basics.',
+                    'Differentiate between Title 32 and Title 10 mission sets.'
                 ]
             },
             '500': {
-                id: '500',
-                title: 'CFDC 500',
-                subtitle: 'Operational Leadership',
-                target: 'TSgt - MSgt & Major',
-                timeline: '4-Day In-Residence Workshop',
-                enrollmentLink: '#',
-                overview: 'The CFDC 500 bridges the gap between tactical execution and organizational leadership. It focuses on unit-level administration, team performance, and personnel management. Mid-tier leaders will learn how to navigate the complex administrative requirements of a squadron while fostering a culture of feedback and high performance.',
+                id: '500', title: 'CFDC 500', subtitle: 'Operational Leadership', target: 'TSgt - MSgt & Major', timeline: '4-Day Workshop', enrollmentLink: '#',
+                overview: 'Bridges tactical execution and organizational leadership. Focuses on unit administration, team performance, and personnel management.',
                 objectives: [
-                    'Master the ACA cycle and effective professional feedback mechanisms.',
-                    'Identify and execute unit-level personnel actions and resource programming.',
-                    'Apply high-performance team dynamics to complex mission problem sets.',
-                    'Navigate unit administration including EPRs, OPRs, and Award writing.',
-                    'Understand the application of UCMJ authority and administrative discipline.'
+                    'Master the ACA cycle and professional feedback.',
+                    'Execute unit-level personnel actions and resource programming.',
+                    'Apply team dynamics to mission problem sets.',
+                    'Navigate unit admin: EPRs, OPRs, and Award writing.',
+                    'Apply UCMJ authority and administrative discipline.'
                 ]
             },
             '700': {
-                id: '700',
-                title: 'CFDC 700',
-                subtitle: 'Strategic Broadening',
-                target: 'SMSgt - CMSgt & Lt Col - Col',
-                timeline: '5-Day Executive Course',
-                enrollmentLink: '#',
-                overview: 'Designed for senior leaders, the CFDC 700 focuses on the strategic enterprise, legislative liaison, and preparing the force for Great Power Competition (GPC). This course provides senior enlisted and officer leaders with the tools to manage organizational culture, engage with inter-agency partners, and align unit capabilities with state and national defense strategies.',
+                id: '700', title: 'CFDC 700', subtitle: 'Strategic Broadening', target: 'SMSgt - CMSgt & Lt Col - Col', timeline: '5-Day Course', enrollmentLink: '#',
+                overview: 'Focuses on strategic enterprise, legislative liaison, and GPC. Tools to manage organizational culture and align capabilities with national defense strategy.',
                 objectives: [
-                    'Understand the Legislative Liaison and State Budgeting process for force design.',
-                    'Integrate Total Force and Inter-agency partners for domestic response operations.',
-                    'Synthesize Great Power Competition (GPC) concepts into Wing-level readiness.',
-                    'Manage strategic communication and shape organizational unit culture.',
-                    'Advise senior leadership on policy alignment and strategic manpower planning.'
+                    'Understand the Legislative Liaison and State Budgeting process.',
+                    'Integrate inter-agency partners for domestic response.',
+                    'Synthesize Great Power Competition (GPC) concepts.',
+                    'Manage strategic communication and shape unit culture.',
+                    'Advise senior leadership on strategic manpower planning.'
                 ]
             }
         };
@@ -136,166 +120,52 @@
                 title: "The Blue Book",
                 subtitle: "The Profession of Arms (AFM 1-1)",
                 sections: [
-                    { 
-                        title: "Chapter 1: The Airman's Identity", 
-                        desc: "Defining who we are and our heritage as American Airmen.",
-                        subsections: [
-                            { name: "The Oath", items: ["Support the Constitution", "Obedience to Orders", "Lifelong Commitment"], detail: "The Oath is a solemn promise and the foundation of our military service." },
-                            { name: "Warrior Ethos", items: ["Warrior Spirit", "Hardiness of Spirit", "Moral Courage"], detail: "Every Airman is a warfighter, maintaining physical and mental readiness for combat." },
-                            { name: "Identity", items: ["Guardian of Freedom", "Wingman, Leader, Warrior", "I will not fail"], detail: "Our communal bond as Airmen defines our role in National Defense." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 2: The Profession of Arms", 
-                        desc: "Our calling and the expectations of our specialized expertise.",
-                        subsections: [
-                            { name: "Airmanship", items: ["Mission Commitment", "Technical Mastery", "Ethical Leadership"], detail: "Unique expertise in air, space, and cyberspace domains." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 3: Core Values", 
-                        desc: "The virtues that define our character.",
-                        subsections: [
-                            { name: "Integrity First", items: ["Honesty", "Courage", "Accountability"], detail: "Doing the right thing even when no one is watching." },
-                            { name: "Service Before Self", items: ["Duty", "Loyalty", "Respect"], detail: "Professional duties take precedence over personal desires." },
-                            { name: "Excellence In All We Do", items: ["Mission", "Discipline", "Teamwork"], detail: "Continuous improvement in all technical and leadership areas." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 4: Force Development", 
-                        desc: "Developing the whole Airman through continuous learning.",
-                        subsections: [
-                            { name: "Lead Self", items: ["Resilience", "Self-Awareness", "Communication"], detail: "Mastering one's own character and capacity." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 5: Professional Conduct", 
-                        desc: "The standards of behavior, customs, and courtesies.",
-                        subsections: [
-                            { name: "Expectations", items: ["AFI 36-2903", "Standards of Conduct", "Customs & Courtesies"], detail: "Upholding the proud traditions of the service." }
-                        ]
-                    }
+                    { title: "Chapter 1: The Airman's Identity", desc: "Heritage and calling.", subsections: [{ name: "The Oath", items: ["Defend Constitution", "Orders", "Commitment"], detail: "A lifelong promise to the nation's system of law." }] },
+                    { title: "Chapter 2: The Profession of Arms", desc: "Specialized expertise.", subsections: [{ name: "Airmanship", items: ["Technical Mastery", "Ethical Lead"], detail: "Expertise in the air and space domains." }] },
+                    { title: "Chapter 3: Core Values", desc: "Virtues of character.", subsections: [{ name: "Core Values", items: ["Integrity First", "Service Before Self", "Excellence"], detail: "The ethical framework for every decision." }] },
+                    { title: "Chapter 4: Force Development", desc: "Continuous learning.", subsections: [{ name: "Qualities", items: ["Resilience", "Self-Awareness"], detail: "Deliberate development of personal character." }] },
+                    { title: "Chapter 5: Professional Conduct", desc: "Standards and tradition.", subsections: [{ name: "Standards", items: ["Bearing", "Dress", "Customs"], detail: "Upholding the professional image of the force." }] }
                 ]
             },
             brown: {
                 title: "The Brown Book",
                 subtitle: "Enlisted Force Structure (AFH 36-2618)",
                 sections: [
-                    { 
-                        title: "Chapter 1: Force Structure Levels", 
-                        desc: "Tactical, Operational, and Strategic leadership levels.",
-                        subsections: [
-                            { name: "Leadership Levels", items: ["Tactical (AB-TSgt)", "Operational (MSgt-SMSgt)", "Strategic (SMSgt-CMSgt)"], detail: "Defining where and how enlisted members execute authority." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 2: Enlisted Tiers", 
-                        desc: "Detailed rank roles and expectations.",
-                        subsections: [
-                            { name: "Junior Enlisted", items: ["Technical Proficient", "Followership"], detail: "Adapting to military life and achieving AFSC mastery." },
-                            { name: "NCO Tier", items: ["Supervisor", "Small-Team Lead", "SME"], detail: "Primary frontline leaders and technical experts." },
-                            { name: "Senior NCO", items: ["Strategic Advisor", "Organizational Manager"], detail: "Leading unit health and advising commanders." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 3: General Responsibilities", 
-                        desc: "Requirements for all Enlisted Airmen.",
-                        subsections: [
-                            { name: "Readiness", items: ["Fitness", "Medical", "Deployability"], detail: "Always ready for global mission execution." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 4: Specific Positions", 
-                        desc: "Leadership roles unique to the enlisted structure.",
-                        subsections: [
-                            { name: "Positions", items: ["First Sergeant", "Command Chief", "SEL"], detail: "Roles managing personnel welfare and state policy." }
-                        ]
-                    },
-                    { 
-                        title: "Chapter 5: Development & Feedback", 
-                        desc: "The deliberate career progression cycle.",
-                        subsections: [
-                            { name: "Mentoring", items: ["ACA Feedback", "PME Milestones"], detail: "Formal cycle for mentoring and tracking growth." }
-                        ]
-                    }
-                ]
-            },
-            blueprint: {
-                title: "The Blueprint",
-                subtitle: "Enlisted Force Development",
-                sections: [
-                    { 
-                        title: "Section 1: Foundational Qualities", 
-                        desc: "Qualities for the Great Power Competition.",
-                        subsections: [
-                            { name: "Lead Self", items: ["Decision Making", "Innovation", "Resilience"], detail: "Core strengths for modern conflict." }
-                        ]
-                    },
-                    { 
-                        title: "Section 2: Career Roadmap", 
-                        desc: "Roadmap for growth through the continuum.",
-                        subsections: [
-                            { name: "Milestones", items: ["ALS/NCOA/SNCOA", "Joint Roles", "Experience"], detail: "The deliberate pathing for California Airmen." }
-                        ]
-                    }
+                    { title: "Chapter 1: Leadership Levels", desc: "Framework of our force.", subsections: [{ name: "Levels", items: ["Tactical", "Operational", "Strategic"], detail: "Defining where and how members lead." }] },
+                    { title: "Chapter 2: Enlisted Tiers", desc: "Detailed rank roles.", subsections: [{ name: "Tiers", items: ["Junior Enlisted", "NCO", "Senior NCO"], detail: "Specific expectations for every rank." }] },
+                    { title: "Chapter 3: General Responsibilities", desc: "Universal requirements.", subsections: [{ name: "Readiness", items: ["Fitness", "Medical", "Skill"], detail: "Every member must be fit to fight." }] },
+                    { title: "Chapter 4: Specific Positions", desc: "Key specialized roles.", subsections: [{ name: "Positions", items: ["First Sergeant", "Command Chief", "SEL"], detail: "Specialized leadership for unit welfare." }] },
+                    { title: "Chapter 5: Development & Feedback", desc: "Progression cycle.", subsections: [{ name: "Cycles", items: ["ACA Feedback", "PME", "Roadmap"], detail: "Deliberate mentoring and tracking growth." }] }
                 ]
             }
         };
 
         const ENLISTED_ROADMAP = [
-            { 
-                id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', steps: ['BMT', 'Tech School', '5-Level Upgrade', 'ALS'], 
-                desc: 'Technical proficiency and adaptation to the profession of arms.', 
-                focusAreas: [
-                    { title: 'Technical mastery', text: 'Proficiency in AFSC and wing mission.', bullets: ['CDCs Completion', 'Journeyman Skill', 'Readiness Mastery', 'Functional Expert'] },
-                    { title: 'Warrior Ethos', text: 'Embodying Air Force culture and values.', bullets: ['Understand Oath', 'Core Values Daily', 'Fitness Standards', 'Professional Conduct'] },
-                    { title: 'Personal Foundation', text: 'Building the base for a successful career.', bullets: ['CAF Awareness', 'Financial Readiness', 'Time Management', 'Spiritual Fitness'] }
-                ] 
-            },
-            { 
-                id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'Shield', steps: ['7-Level Upgrade', 'Supervisor Safety', 'NCOA', 'CCAF'], 
-                desc: 'Frontline leadership and supervisor tier.', 
-                focusAreas: [
-                    { title: 'Frontline Lead', text: 'Supervising small teams and ensuring productivity.', bullets: ['ACA Master', 'EPR/OPR Workflow', 'Counseling Airmen', 'Standard Enforcement'] },
-                    { title: 'Technical Leadership', text: 'Maintaining functional expertise.', bullets: ['Risk Management', 'Operational SME', 'Quality Control', 'Asset Management'] },
-                    { title: 'Airman Growth', text: 'Mentoring the junior enlisted force.', bullets: ['Reward Writing', 'Path Guidance', 'Career Coaching', 'Unit Morale'] }
-                ] 
-            },
-            { 
-                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', steps: ['SNCOA', 'SEJPME', 'Leadership Seminar', 'Board Review'], 
-                desc: 'Strategic advisors and organizational managers.', 
-                focusAreas: [
-                    { title: 'Strategic Vision', text: 'Advising command teams and shaping culture.', bullets: ['Climate Assessment', 'Change Management', 'Policy Influencer', 'State Strategy'] },
-                    { title: 'Enterprise Mgmt', text: 'Managing state/wing assets and manpower.', bullets: ['Budget Programming', 'Manpower Optimization', 'Infrastructure Ops', 'Talent Management'] },
-                    { title: 'Joint Ops', text: 'Working with inter-agency and Total Force partners.', bullets: ['Multi-Domain Ops', 'Crisis Coordination', 'Joint PME Engagement', 'Community Liaison'] }
-                ] 
-            }
+            { id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', steps: ['BMT', 'Tech School', '5-Level Upgrade', 'ALS'], desc: 'Adaptation and proficiency.', focusAreas: [{ title: 'Technician', text: 'Mastering AFSC.', bullets: ['CDCs', 'Journeyman', 'Readiness'] }, { title: 'Ethos', text: 'Core Values.', bullets: ['The Oath', 'Bearing', 'Standards'] }] },
+            { id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'Shield', steps: ['7-Level Upgrade', 'Supervisor Safety', 'NCOA', 'CCAF'], desc: 'Frontline leadership.', focusAreas: [{ title: 'Supervisor', text: 'Managing small teams.', bullets: ['ACA Feedback', 'Counseling', 'EPRs'] }, { title: 'Operations', text: 'Section leadership.', bullets: ['Risk Mgmt', 'Resources', 'Training'] }] },
+            { id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', steps: ['SNCOA', 'SEJPME', 'Leadership Seminar', 'Boards'], desc: 'Strategic management.', focusAreas: [{ title: 'Advisor', text: 'Advising command.', bullets: ['Climate', 'Policy', 'Force Design'] }, { title: 'Enterprise', text: 'Asset management.', bullets: ['Manpower', 'Budgeting', 'Planning'] }] }
         ];
 
         const OFFICER_ROADMAP = [
-            { id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'Target', steps: ['OTS', 'Tech School', 'SOS'], desc: 'Tactical flight leadership.', focusAreas: [{ title: 'Command', text: 'Managing flight operations.', bullets: ['Personnel Wellness', 'Admin Flow', 'EPR Writing'] }] }
+            { id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'Target', steps: ['OTS', 'Tech School', 'SOS'], desc: 'Tactical competency.', focusAreas: [{ title: 'Flight Command', text: 'Managing flights.', bullets: ['Wellness', 'Admin Flow'] }] }
         ];
 
         // --- FIREBASE INITIALIZATION ---
+        const rawFirebaseConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+        const firebaseConfig = rawFirebaseConfig ? JSON.parse(rawFirebaseConfig) : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+
         let db = null;
         let auth = null;
 
-        try {
-            const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            const firebaseConfig = rawConfig ? JSON.parse(rawConfig) : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-
-            if (firebaseConfig.apiKey) {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                auth = firebase.auth();
-                db = firebase.firestore();
+        if (firebaseConfig.apiKey) {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
             }
-        } catch (e) {
-            console.error("Firebase Initialization Error: ", e);
+            auth = firebase.auth();
+            db = firebase.firestore();
         }
 
-        // --- SHARED COMPONENTS ---
+        // --- COMPONENTS ---
 
         const Icon = ({ name, size = 24, className = "" }) => {
             const containerRef = useRef(null);
@@ -323,22 +193,14 @@
                 <div className="group perspective-1000 h-64 w-full cursor-pointer" onClick={() => setFlipped(!flipped)}>
                     <div className={`relative h-full w-full transition-all duration-700 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}>
                         <div className="absolute inset-0 h-full w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-6 flex flex-col items-center justify-center text-center backface-hidden z-20">
-                            <div className="bg-blue-50 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500">
-                                <Icon name="star" size={32} className="text-[#00308F]" />
-                            </div>
+                            <div className="bg-blue-50 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform"><Icon name="star" size={32} className="text-[#00308F]" /></div>
                             <h4 className="text-lg font-black text-slate-900 mb-2 leading-tight">{title}</h4>
-                            <p className="text-xs text-slate-500 leading-relaxed">{text}</p>
-                            <div className="mt-4 flex items-center text-[10px] font-black text-[#00308F] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Expand <Icon name="refresh-cw" size={10} className="ml-1" /></div>
+                            <p className="text-xs text-slate-500 leading-relaxed px-4">{text}</p>
                         </div>
                         <div className="absolute inset-0 h-full w-full bg-[#00308F] rounded-3xl shadow-lg p-6 flex flex-col backface-hidden rotate-y-180 text-white overflow-hidden z-10 text-left">
                             <h4 className="text-sm font-black mb-4 border-b border-blue-400/50 pb-2 uppercase tracking-widest leading-none">{title}</h4>
                             <ul className="text-[10px] space-y-2.5 overflow-y-auto custom-scroll pr-2">
-                                {bullets && bullets.map((b, i) => (
-                                    <li key={i} className="flex items-start">
-                                        <Icon name="check-circle" size={10} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" />
-                                        <span className="font-medium leading-tight">{b}</span>
-                                    </li>
-                                ))}
+                                {bullets && bullets.map((b, i) => (<li key={i} className="flex items-start"><Icon name="check-circle" size={10} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" /><span className="font-medium leading-tight">{b}</span></li>))}
                             </ul>
                         </div>
                     </div>
@@ -349,39 +211,26 @@
         const BookViewer = ({ book, onBack }) => {
             const isBrown = book.title.toLowerCase().includes('brown');
             const colorClass = isBrown ? 'bg-[#5D4037]' : 'bg-[#00308F]';
-            const accentClass = isBrown ? 'text-orange-200' : 'text-blue-200';
-            const bulletClass = isBrown ? 'bg-orange-300' : 'bg-blue-300';
-
             return (
                 <div className="animate-enter space-y-12 pb-20">
-                    <button onClick={onBack} className="flex items-center text-sm font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors"><Icon name="arrow-left" size={16} className="mr-2" /> Back to Roadmap</button>
+                    <button onClick={onBack} className="flex items-center text-sm font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors"><Icon name="arrow-left" size={16} className="mr-2" /> Back</button>
                     <div className={`${colorClass} rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden`}>
-                        <div className="relative z-10">
-                            <h3 className="text-5xl font-black text-white leading-none tracking-tight">{book.title}</h3>
-                            <p className={`${accentClass} font-bold uppercase mt-3 tracking-widest text-sm relative z-10`}>{book.subtitle}</p>
-                        </div>
-                        <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12">
-                            <Icon name="book" size={300} />
-                        </div>
+                        <h3 className="text-5xl font-black text-white leading-none relative z-10">{book.title}</h3>
+                        <p className="text-white/60 font-bold uppercase mt-3 tracking-widest text-sm relative z-10">{book.subtitle}</p>
+                        <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12"><Icon name="book" size={300} /></div>
                     </div>
-
                     <div className="grid lg:grid-cols-1 gap-12">
                         {book.sections.map((section, i) => (
-                            <div key={i} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 border-b pb-6">
-                                    <div>
-                                        <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 leading-none">{section.title}</h4>
-                                        <p className="text-slate-500 font-bold mt-1">{section.desc}</p>
-                                    </div>
-                                    <Icon name="info" className="text-slate-200 mt-4 md:mt-0" size={32} />
-                                </div>
+                            <div key={i} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm">
+                                <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-4 leading-none">{section.title}</h4>
+                                <p className="text-slate-500 font-bold mb-8 italic">"{section.desc}"</p>
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                                     {section.subsections.map((sub, j) => (
                                         <div key={j} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
                                             <h5 className={`font-black uppercase text-xs tracking-widest mb-3 leading-none ${isBrown ? 'text-[#5D4037]' : 'text-[#00308F]'}`}>{sub.name}</h5>
                                             <p className="text-[10px] text-slate-400 font-bold mb-4 leading-relaxed uppercase">{sub.detail}</p>
                                             <div className="space-y-2">
-                                                {sub.items.map((item, k) => (<div key={k} className="flex items-center text-[10px] font-black text-slate-700 uppercase tracking-wider leading-tight"><div className={`w-1 h-1 rounded-full mr-2 ${bulletClass}`}></div>{item}</div>))}
+                                                {sub.items.map((item, k) => (<div key={k} className="flex items-center text-[10px] font-black text-slate-700 uppercase tracking-wider leading-tight"><div className={`w-1 h-1 rounded-full mr-2 ${isBrown ? 'bg-orange-300' : 'bg-blue-300'}`}></div>{item}</div>))}
                                             </div>
                                         </div>
                                     ))}
@@ -400,8 +249,8 @@
                 return (
                     <div className="animate-enter space-y-8">
                         <button onClick={() => setSelectedId(null)} className="flex items-center text-sm font-black text-slate-400 uppercase tracking-widest"><Icon name="arrow-left" size={16} className="mr-2" /> Catalog</button>
-                        <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden"><h3 className="text-5xl font-black text-white leading-none relative z-10">{course.title}</h3><p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-sm relative z-10">{course.subtitle}</p><a href={course.enrollmentLink} target="_blank" className="mt-12 inline-block bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black uppercase text-xs shadow-xl hover:scale-105 transition-all relative z-10 tracking-widest">Enrollment Portal</a><div className="absolute -right-20 -bottom-20 opacity-5"><Icon name="shield" size={300} /></div></div>
-                        <div className="grid md:grid-cols-2 gap-12 mt-12"><div className="space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b pb-2">Learning Objectives</h4>{(course.objectives || []).map((obj, i) => (<div key={i} className="flex items-start bg-white p-5 rounded-3xl border border-slate-100 shadow-sm font-bold text-slate-700"><Icon name="check-circle" className="text-green-500 mr-4 flex-shrink-0" size={18} />{obj}</div>))}</div><div className="bg-slate-50 p-10 rounded-[3rem] space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b border-slate-200 pb-2">Course Overview</h4><p className="text-slate-600 leading-relaxed font-medium">{course.overview}</p></div></div>
+                        <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden"><h3 className="text-5xl font-black text-white relative z-10 leading-none">{course.title}</h3><p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-sm relative z-10">{course.subtitle}</p><a href={course.enrollmentLink} target="_blank" className="mt-12 inline-block bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black uppercase text-xs shadow-xl hover:scale-105 transition-all relative z-10 tracking-widest">Enrollment Portal</a><div className="absolute -right-20 -bottom-20 opacity-5"><Icon name="shield" size={300} /></div></div>
+                        <div className="grid md:grid-cols-2 gap-12 mt-12"><div className="space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b pb-2">Learning Objectives</h4>{(course.objectives || []).map((obj, i) => (<div key={i} className="flex items-start bg-white p-5 rounded-3xl border border-slate-100 shadow-sm font-bold text-slate-700"><Icon name="check-circle" className="text-green-500 mr-4 flex-shrink-0" size={18} />{obj}</div>))}</div><div className="bg-slate-50 p-10 rounded-[3rem] space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b border-slate-200 pb-2">Overview</h4><p className="text-slate-600 leading-relaxed font-medium">{course.overview}</p></div></div>
                     </div>
                 );
             }
@@ -410,9 +259,9 @@
                     <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase text-center">Course Catalog</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         {['300', '500', '700'].map(id => (
-                            <div key={id} onClick={() => setSelectedId(id)} className="bg-white border border-slate-100 rounded-[2.5rem] p-10 hover:shadow-2xl transition-all cursor-pointer group relative overflow-hidden flex flex-col min-h-[380px]">
+                            <div key={id} onClick={() => setSelectedId(id)} className="bg-white border border-slate-100 rounded-[3rem] p-10 hover:shadow-2xl transition-all cursor-pointer group relative overflow-hidden flex flex-col min-h-[380px]">
                                 <div className="text-7xl font-black text-slate-50 absolute -right-2 -top-2 select-none">#{id}</div>
-                                <div className="relative z-10"><h4 className="text-3xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{courses[id]?.title || `CFDC ${id}`}</h4><p className="text-[10px] font-black text-[#00308F] uppercase mt-2 tracking-widest">{courses[id]?.subtitle}</p><div className="mt-8 bg-slate-50 px-4 py-1.5 rounded-lg text-[10px] font-black text-slate-400 uppercase w-fit tracking-widest">{courses[id]?.target}</div><p className="text-sm text-slate-500 mt-6 leading-relaxed line-clamp-4 font-medium">{courses[id]?.overview}</p></div>
+                                <div className="relative z-10"><h4 className="text-3xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{courses[id]?.title || `CFDC ${id}`}</h4><p className="text-[10px] font-black text-[#00308F] uppercase mt-2 tracking-widest">{courses[id]?.subtitle}</p><p className="text-sm text-slate-500 mt-8 leading-relaxed line-clamp-4 font-medium">{courses[id]?.overview}</p></div>
                                 <div className="mt-auto pt-8 flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest group-hover:text-[#00308F]">Details <Icon name="chevron-right" size={14} className="ml-2" /></div>
                             </div>
                         ))}
@@ -428,12 +277,9 @@
                         <div className="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8"><Icon name="shield" size={14} className="mr-2 text-blue-300"/> Force Development Hub</div>
                         <h2 className="text-5xl md:text-8xl font-black mb-10 tracking-tighter uppercase text-white drop-shadow-sm leading-none">FORCE DEVELOPMENT HUB</h2>
                         <div className="flex flex-wrap justify-center gap-6">
-                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all text-xs uppercase tracking-widest">ENLISTED TRACK</button>
-                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-12 py-5 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-xs uppercase tracking-widest">CFDC PROGRAMS</button>
+                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-widest">ENLISTED TRACK</button>
+                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-12 py-5 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-sm uppercase tracking-widest">CFDC PROGRAMS</button>
                         </div>
-                    </div>
-                    <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12">
-                        <Icon name="shield" size={400} />
                     </div>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-8">
@@ -466,7 +312,7 @@
             const [expandedTier, setExpandedTier] = useState(0);
             const [selectedBook, setSelectedBook] = useState(null);
 
-            // Auth Hook
+            // Auth Logic (Rule 3)
             useEffect(() => {
                 if (!auth) return;
                 const initAuth = async () => {
@@ -474,13 +320,13 @@
                     try {
                         if (token) await auth.signInWithCustomToken(token);
                         else await auth.signInAnonymously();
+                        auth.onAuthStateChanged(setUser);
                     } catch (e) { console.error("Auth error", e); }
-                    auth.onAuthStateChanged(setUser);
                 };
                 initAuth();
             }, []);
 
-            // Data Hook
+            // Data Hook (Rule 1 & 2)
             useEffect(() => {
                 if (!user || !db) return;
                 const unsubRes = db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').onSnapshot(snap => { const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); setResources(list); }, err => console.error(err));
@@ -497,7 +343,7 @@
                     if (!user || !db) return;
                     const unsub = db.collection('artifacts').doc(firebaseAppId).collection('users').doc(user.uid).collection('progress').onSnapshot((snap) => {
                         const data = {}; snap.forEach(doc => { data[doc.id] = doc.data().completed; }); setProgress(data);
-                    });
+                    }, err => console.error(err));
                     return () => unsub();
                 }, [user]);
                 const toggleItem = async (id) => {
@@ -553,7 +399,12 @@
                                                             <h5 className="font-black text-slate-400 uppercase text-[10px] tracking-widest mb-6 text-left">Track Milestones</h5>
                                                             {tier.steps.map((step, j) => {
                                                                 const id = `${tier.id}-${step}`; const done = isComplete(id);
-                                                                return (<div key={j} onClick={() => toggleItem(id)} className={`flex items-center p-4 rounded-2xl border-2 mb-2 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200 shadow-none' : 'bg-white border-slate-100'}`}><div className={`w-6 h-6 rounded-lg mr-4 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={14}/>}</div><span className={`font-bold text-sm ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span></div>);
+                                                                return (
+                                                                    <div key={j} onClick={() => toggleItem(id)} className={`flex items-center p-4 rounded-2xl border-2 mb-2 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200 shadow-none' : 'bg-white border-slate-100 shadow-sm hover:border-blue-200'}`}>
+                                                                        <div className={`w-6 h-6 rounded-lg mr-4 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={14}/>}</div>
+                                                                        <span className={`font-bold text-sm ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span>
+                                                                    </div>
+                                                                );
                                                             })}
                                                         </div>
                                                         <div className="grid gap-4 content-start">
@@ -586,6 +437,25 @@
                 );
             };
 
+            const ResourceView = ({ resources, categoryFilter, setCategoryFilter }) => {
+                const [searchTerm, setSearchTerm] = useState('');
+                const filtered = resources.filter(r => (r.title || "").toLowerCase().includes(searchTerm.toLowerCase()) && (categoryFilter === 'All' || r.category === categoryFilter));
+                return (
+                    <div className="animate-enter space-y-12">
+                        <div className="flex flex-col md:flex-row justify-between border-b border-slate-100 pb-10 gap-8">
+                            <h2 className="text-3xl font-black uppercase text-slate-900 leading-none tracking-tight">Library</h2>
+                            <div className="relative"><Icon name="search" size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" /><input type="text" placeholder="Search..." className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-sm shadow-sm focus:ring-2 focus:ring-blue-100 w-full md:w-80 transition-all" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/></div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {['All', 'Regulations', 'ALQs', 'Reading', 'Videos'].map(cat => (<button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${categoryFilter === cat ? 'bg-[#00308F] text-white shadow-lg' : 'bg-white border text-slate-400'}`}>{cat}</button>))}
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {filtered.map(res => (<div key={res.id} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group flex flex-col h-full"><span className="bg-blue-50 text-[#00308F] px-4 py-1.5 rounded-full text-[10px] font-black uppercase mb-4 inline-block w-fit">{res.category}</span><h4 className="text-xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{res.title}</h4><p className="text-xs text-slate-500 mb-6 leading-relaxed flex-grow">{res.description}</p><a href={res.link} target="_blank" className="flex items-center text-[10px] font-black text-slate-300 uppercase hover:text-[#00308F]">Open Asset <Icon name="external-link" size={12} className="ml-2" /></a></div>))}
+                        </div>
+                    </div>
+                );
+            };
+
             return (
                 <div className="flex flex-col min-h-screen selection:bg-[#00308F] selection:text-white bg-slate-50 font-sans">
                     <header className="glass-header border-b h-24 flex items-center sticky top-0 z-50 shadow-sm">
@@ -607,7 +477,7 @@
                         {activeTab === 'officer' && <RoadmapView data={OFFICER_ROADMAP} title="Officer Continuum" type="officer" userProgress={userProgress} />}
                         {activeTab === 'cfdc' && <CFDCView courses={courses} />}
                         {activeTab === 'resources' && <ResourceView resources={resources} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
-                        {activeTab === 'admin' && (isAdminAuth ? <div className="p-12 text-slate-400 italic">Manage portal resources via direct Firebase access or console tools.</div> : <AdminLogin onLogin={() => setIsAdminAuth(true)} />)}
+                        {activeTab === 'admin' && (isAdminAuth ? <div className="p-12 text-slate-400 italic text-center">Manage portal resources via direct Firebase access or console tools.</div> : <AdminLogin onLogin={() => setIsAdminAuth(true)} />)}
                     </main>
                     <footer className="bg-slate-900 text-slate-500 py-24 border-t-8 border-[#00308F]"><div className="max-w-7xl mx-auto px-4 text-center"><Icon name="shield" size={48} className="mx-auto mb-6 opacity-20" /><p className="text-[10px] font-black uppercase tracking-[0.5em] opacity-40">Integrity First • Service Before Self • Excellence In All We Do</p></div></footer>
                 </div>
