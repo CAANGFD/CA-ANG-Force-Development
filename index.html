@@ -10,17 +10,9 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Core -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* THEME: CA ANG COMMAND PREMIERE */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -31,26 +23,25 @@
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
         
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .glass-header {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
         }
+
+        body { font-size: 16px; scroll-behavior: smooth; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef } = React;
 
         // --- CONSTANTS & ASSETS ---
-        const ADMIN_PASSWORD = "change-me-1234"; 
-        const firebaseAppId = typeof __app_id !== 'undefined' ? __app_id : 'ca-ang-force-dev';
-
         const IMAGES = {
             logo: "caang.png",
             unit129: "129.svg",
@@ -78,118 +69,107 @@
             { name: 'Chief Master Sergeant Seth M. Zweben', title: 'State Command Chief', org: 'California Air National Guard', img: IMAGES.chief }
         ];
 
-        // --- EXHAUSTIVE DATA STRUCTURES ---
-        
-        const CFDC_SEED = {
+        // --- DATA STRUCTURES ---
+
+        const RESOURCES_DATA = [
+            { id: 1, title: "AFM 1-1: The Blue Book", category: "Regulations", description: "The foundation of our profession and character.", link: "#" },
+            { id: 2, title: "AFH 36-2618: The Brown Book", category: "Regulations", description: "The structure and expectations of the Enlisted force.", link: "#" },
+            { id: 3, title: "The Blueprint", category: "ALQs", description: "The roadmap for enlisted development and qualities.", link: "#" },
+            { id: 4, title: "CA ANG Strategic Plan", category: "Reading", description: "The vision for the future of the California Air Guard.", link: "#" }
+        ];
+
+        const CFDC_DATA = {
             '300': {
                 id: '300', title: 'CFDC 300', subtitle: 'Foundational Development', target: 'AB - SSgt & 2Lt - Capt', timeline: '3-Day Seminar', enrollmentLink: '#',
-                overview: 'Transition from technician to professional Airman. Emphasis on CA ANG heritage, dual-mission environments (State/Federal), and interpersonal communication foundation.',
+                overview: 'The CFDC 300 focuses on the transition from a technician to a professional Airman. Emphasis is placed on CA ANG heritage, the dual-mission environment (State and Federal), and the development of interpersonal communication skills. This course establishes the character foundation required for a long-term career in the Profession of Arms.',
                 objectives: [
-                    'Analyze the Airman’s Creed and Oath in a California context.',
-                    'Examine CA ANG heritage and Wing lineages.',
-                    'Develop Emotional Intelligence for team integration.',
-                    'Master professional military writing and briefing standards.',
-                    'Differentiate between Title 32 and Title 10 missions.'
+                    'Analyze the Airman’s Creed and Oath of Enlistment in a modern California context.',
+                    'Examine CA ANG heritage and Wing-specific lineages.',
+                    'Develop Emotional Intelligence (EQ) and self-awareness for team integration.',
+                    'Master the fundamentals of professional military writing and briefing standards.',
+                    'Differentiate between Title 32 State and Title 10 Federal mission sets.'
                 ]
             },
             '500': {
                 id: '500', title: 'CFDC 500', subtitle: 'Operational Leadership', target: 'TSgt - MSgt & Major', timeline: '4-Day Workshop', enrollmentLink: '#',
-                overview: 'Bridges tactical execution and organizational leadership. Focuses on unit administration, team performance, and personnel management for mid-tier leaders.',
+                overview: 'The CFDC 500 bridges the gap between tactical execution and organizational leadership. It focuses on unit-level administration, team performance, and personnel management. Mid-tier leaders will learn how to navigate the complex administrative requirements of a squadron while fostering a culture of feedback and high performance.',
                 objectives: [
-                    'Master the ACA cycle and effective professional feedback.',
-                    'Execute unit personnel actions and resource programming.',
-                    'Apply high-performance team dynamics to missions.',
-                    'Navigate EPR, OPR, and Award writing standards.',
-                    'Apply UCMJ authority and administrative discipline.'
+                    'Master the ACA cycle and effective professional feedback mechanisms.',
+                    'Identify and execute unit-level personnel actions and resource programming.',
+                    'Apply high-performance team dynamics to complex mission problem sets.',
+                    'Navigate unit administration including EPRs, OPRs, and Award writing.',
+                    'Understand the application of UCMJ authority and administrative discipline.'
                 ]
             },
             '700': {
                 id: '700', title: 'CFDC 700', subtitle: 'Strategic Broadening', target: 'SMSgt - CMSgt & Lt Col - Col', timeline: '5-Day Course', enrollmentLink: '#',
-                overview: 'Strategic enterprise focus. Legislative liaison, GPC readiness, and organizational culture management for senior Wing and State leaders.',
+                overview: 'Designed for senior leaders, the CFDC 700 focuses on the strategic enterprise, legislative liaison, and preparing the force for Great Power Competition (GPC). This course provides senior enlisted and officer leaders with the tools to manage organizational culture, engage with inter-agency partners, and align unit capabilities with state and national defense strategies.',
                 objectives: [
-                    'Understand the Legislative Liaison and State Budgeting process.',
-                    'Integrate inter-agency partners for domestic response.',
-                    'Synthesize Great Power Competition (GPC) concepts.',
-                    'Manage strategic communication and shape unit culture.',
-                    'Advise leadership on strategic manpower planning.'
+                    'Understand the Legislative Liaison and State Budgeting process for force design.',
+                    'Integrate Total Force and Inter-agency partners for domestic response operations.',
+                    'Synthesize Great Power Competition (GPC) concepts into Wing-level readiness.',
+                    'Manage strategic communication and shape organizational unit culture.',
+                    'Advise senior leadership on policy alignment and strategic manpower planning.'
                 ]
             }
         };
 
         const BOOK_CONTENT = {
             blue: {
-                title: "The Blue Book",
-                subtitle: "The Profession of Arms (AFM 1-1)",
+                title: "The Blue Book", subtitle: "The Profession of Arms (AFM 1-1)",
                 sections: [
-                    { title: "Chapter 1: The Airman's Identity", desc: "Heritage and calling.", subsections: [{ name: "The Oath", items: ["Defend Constitution", "Orders", "Commitment"], detail: "A lifelong promise prioritizing the nation's values." }] },
-                    { title: "Chapter 2: The Profession of Arms", desc: "Specialized expertise.", subsections: [{ name: "Airmanship", items: ["Mission Focus", "Technical Mastery"], detail: "Unique expertise in air and space domains." }] },
-                    { title: "Chapter 3: Core Values", desc: "Character virtues.", subsections: [{ name: "Core Values", items: ["Integrity", "Service", "Excellence"], detail: "The ethical framework for every decision." }] },
-                    { title: "Chapter 4: Force Development", desc: "Continuous learning.", subsections: [{ name: "Qualities", items: ["Resilience", "Self-Awareness"], detail: "Deliberate character and capacity growth." }] },
-                    { title: "Chapter 5: Professional Conduct", desc: "Standards and tradition.", subsections: [{ name: "Standards", items: ["Bearing", "Dress", "Customs"], detail: "Projecting the discipline of the force." }] }
+                    { title: "Chapter 1: Identity", desc: "Our heritage as American Airmen.", subsections: [{ name: "The Oath", items: ["Support the Constitution", "Obey Orders"], detail: "A promise prioritizing national values." }] },
+                    { title: "Chapter 2: Arms", desc: "Expertise.", subsections: [{ name: "Airmanship", items: ["Mission Focus", "Technical Mastery"], detail: "Unique expertise in air and space." }] },
+                    { title: "Chapter 3: Values", desc: "Character virtues.", subsections: [{ name: "Integrity First", items: ["Honesty", "Accountability"], detail: "Doing the right thing always." }] },
+                    { title: "Chapter 4: Growth", desc: "Learning.", subsections: [{ name: "Foundational", items: ["Resilience", "Mentorship"], detail: "Deliberate character growth." }] },
+                    { title: "Chapter 5: Conduct", desc: "Tradition.", subsections: [{ name: "Standards", items: ["Dress/Appearance", "Customs"], detail: "Projecting discipline." }] }
                 ]
             },
             brown: {
-                title: "The Brown Book",
-                subtitle: "Enlisted Force Structure (AFH 36-2618)",
+                title: "The Brown Book", subtitle: "Enlisted Force Structure (AFH 36-2618)",
                 sections: [
-                    { title: "Chapter 1: Leadership Levels", desc: "Force framework.", subsections: [{ name: "Levels", items: ["Tactical", "Operational", "Strategic"], detail: "Defining where and how members lead." }] },
-                    { title: "Chapter 2: Enlisted Tiers", desc: "Detailed rank roles.", subsections: [{ name: "Tiers", items: ["Junior Enlisted", "NCO", "Senior NCO"], detail: "Specific expectations for every rank." }] },
-                    { title: "Chapter 3: Responsibilities", desc: "Universal requirements.", subsections: [{ name: "Readiness", items: ["Fitness", "Medical", "Deployable"], detail: "Every member must be fit to fight." }] },
-                    { title: "Chapter 4: Specific Positions", desc: "Specialized roles.", subsections: [{ name: "Positions", items: ["First Sergeant", "Command Chief", "SEL"], detail: "Leaders managing welfare and state policy." }] },
-                    { title: "Chapter 5: Development", desc: "Progression cycle.", subsections: [{ name: "Cycles", items: ["ACA Feedback", "PME", "Roadmap"], detail: "Formal mentoring and tracking growth." }] }
+                    { title: "Chapter 1: Structure", desc: "Leadership framework.", subsections: [{ name: "Levels", items: ["Tactical", "Operational", "Strategic"], detail: "Where members execute authority." }] },
+                    { title: "Chapter 2: Tiers", desc: "Detailed rank roles.", subsections: [{ name: "Tiers", items: ["Junior Enlisted", "NCO", "Senior NCO"], detail: "Expectations for every rank." }] },
+                    { title: "Chapter 3: Reqs", desc: "Universal duties.", subsections: [{ name: "Readiness", items: ["Fitness", "Medical"], detail: "Always fit to fight." }] },
+                    { title: "Chapter 4: Positions", desc: "Key roles.", subsections: [{ name: "Leadership", items: ["First Sergeant", "Command Chief"], detail: "Personnel welfare advisors." }] },
+                    { title: "Chapter 5: Cycles", desc: "Mentoring.", subsections: [{ name: "Feedback", items: ["ACA Cycle", "Standards"], detail: "Deliberate mentoring." }] }
+                ]
+            },
+            blueprint: {
+                title: "The Blueprint", subtitle: "Enlisted Force Development",
+                sections: [
+                    { title: "Foundational", desc: "GPC Competencies.", subsections: [{ name: "Qualities", items: ["Innovation", "Resilience"], detail: "Modern conflict readiness." }] },
+                    { title: "Continuum", desc: "Deliberate roadmap.", subsections: [{ name: "Roadmap", items: ["PME", "Assignments", "Education"], detail: "The California Airman path." }] }
                 ]
             }
         };
 
         const ENLISTED_ROADMAP = [
             { 
-                id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', steps: ['Basic Training', 'Tech School', '5-Level Upgrade', 'ALS'], 
-                desc: 'Technical proficiency and military adaptation.', 
+                id: 'amn', title: 'Airman Tier', ranks: 'AB - SrA', icon: 'Users', steps: ['BMT', 'Tech School', '5-Level Upgrade', 'ALS'], 
+                desc: 'Technical proficiency and adaptation to the profession of arms.', 
                 focusAreas: [
-                    { title: 'Technical mastery', text: 'Proficiency in AFSC and mission.', bullets: ['CDCs Completion', 'Journeyman Skill', 'Readiness Mastery'] },
-                    { title: 'Warrior Ethos', text: 'Embodying Air Force culture.', bullets: ['The Oath', 'Bearing', 'Standards'] }
+                    { title: 'Technical Mastery', text: 'Proficiency in AFSC.', bullets: ['CDCs Completion', 'Journeyman Skill', 'Readiness Mastery'] },
+                    { title: 'Warrior Ethos', text: 'Core Values daily.', bullets: ['Understand Oath', 'Bearer of Culture', 'Fitness Standards'] }
                 ] 
             },
             { 
                 id: 'nco', title: 'NCO Tier', ranks: 'SSgt - TSgt', icon: 'Shield', steps: ['7-Level Upgrade', 'Supervisor Safety', 'NCOA', 'CCAF'], 
                 desc: 'Frontline leadership and supervision.', 
                 focusAreas: [
-                    { title: 'Frontline Lead', text: 'Supervising small teams.', bullets: ['ACA Feedback', 'Counseling', 'EPRs'] },
-                    { title: 'Operations', text: 'Section leadership.', bullets: ['Risk Mgmt', 'Resources', 'Training'] }
+                    { title: 'Frontline Lead', text: 'Managing small teams.', bullets: ['ACA Feedback', 'Counseling', 'EPR Workflow'] },
+                    { title: 'Technical Lead', text: 'Section health.', bullets: ['Risk Mgmt', 'Resources', 'Training Plans'] }
                 ] 
             },
             { 
-                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', steps: ['SNCOA', 'SEJPME', 'Leadership Seminar', 'State Boards'], 
+                id: 'snco', title: 'SNCO Tier', ranks: 'MSgt - CMSgt', icon: 'Award', steps: ['SNCOA', 'SEJPME', 'Leadership Seminar', 'Boards'], 
                 desc: 'Strategic management and advisory.', 
                 focusAreas: [
-                    { title: 'Advisor', text: 'Advising command teams.', bullets: ['Climate', 'Policy', 'Force Design'] },
-                    { title: 'Enterprise', text: 'Asset management.', bullets: ['Manpower', 'Budgeting', 'Planning'] }
+                    { title: 'Advisor', text: 'Command support.', bullets: ['Climate Assessment', 'Policy Influence', 'Strategic Planning'] },
+                    { title: 'Enterprise', text: 'State assets.', bullets: ['Manpower', 'Budgeting', 'Force Design'] }
                 ] 
             }
         ];
-
-        const OFFICER_ROADMAP = [
-            { id: 'cgo', title: 'Company Grade', ranks: '2Lt - Capt', icon: 'Target', steps: ['OTS', 'Tech School', 'SOS'], desc: 'Tactical competency.', focusAreas: [{ title: 'Command', text: 'Managing flights.', bullets: ['Wellness', 'Admin Flow'] }] }
-        ];
-
-        // --- FIREBASE INITIALIZATION ---
-        let db = null;
-        let auth = null;
-
-        try {
-            const rawConfig = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
-            const firebaseConfig = rawConfig ? JSON.parse(rawConfig) : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-
-            if (firebaseConfig.apiKey) {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                auth = firebase.auth();
-                db = firebase.firestore();
-            }
-        } catch (e) {
-            console.error("Firebase Initialization Error: ", e);
-        }
 
         // --- SUB-COMPONENTS ---
 
@@ -218,23 +198,15 @@
             return (
                 <div className="group perspective-1000 h-64 w-full cursor-pointer" onClick={() => setFlipped(!flipped)}>
                     <div className={`relative h-full w-full transition-all duration-700 transform-style-3d ${flipped ? 'rotate-y-180' : ''}`}>
-                        <div className="absolute inset-0 h-full w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-6 flex flex-col items-center justify-center text-center backface-hidden z-20">
-                            <div className="bg-blue-50 p-4 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500">
-                                <Icon name="star" size={32} className="text-[#00308F]" />
-                            </div>
-                            <h4 className="text-xl font-black text-slate-900 mb-2 leading-tight">{title}</h4>
-                            <p className="text-sm text-slate-500 leading-relaxed px-2">{text}</p>
-                            <div className="mt-4 flex items-center text-xs font-black text-[#00308F] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Expand <Icon name="refresh-cw" size={10} className="ml-1" /></div>
+                        <div className="absolute inset-0 h-full w-full bg-white rounded-3xl shadow-md border border-slate-100 p-6 flex flex-col items-center justify-center text-center backface-hidden z-20">
+                            <div className="bg-blue-50 p-4 rounded-2xl mb-4"><Icon name="star" size={32} className="text-[#00308F]" /></div>
+                            <h4 className="text-lg font-black text-slate-900 mb-2 leading-tight">{title}</h4>
+                            <p className="text-sm text-slate-500 leading-relaxed">{text}</p>
                         </div>
                         <div className="absolute inset-0 h-full w-full bg-[#00308F] rounded-3xl shadow-lg p-6 flex flex-col backface-hidden rotate-y-180 text-white overflow-hidden z-10 text-left">
-                            <h4 className="text-base font-black mb-4 border-b border-blue-400/50 pb-2 uppercase tracking-widest leading-none">{title}</h4>
-                            <ul className="text-sm space-y-3 overflow-y-auto custom-scroll pr-2">
-                                {bullets && bullets.map((b, i) => (
-                                    <li key={i} className="flex items-start">
-                                        <Icon name="check-circle" size={12} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" />
-                                        <span className="font-medium leading-tight">{b}</span>
-                                    </li>
-                                ))}
+                            <h4 className="text-sm font-black mb-4 border-b border-blue-400/50 pb-2 uppercase tracking-widest leading-none">{title}</h4>
+                            <ul className="text-[13px] space-y-2.5 overflow-y-auto custom-scroll pr-2 font-medium">
+                                {bullets && bullets.map((b, i) => (<li key={i} className="flex items-start"><Icon name="check-circle" size={12} className="mr-2 mt-0.5 text-blue-300 flex-shrink-0" /><span className="leading-tight">{b}</span></li>))}
                             </ul>
                         </div>
                     </div>
@@ -246,35 +218,27 @@
             const isBrown = book.title.toLowerCase().includes('brown');
             const colorClass = isBrown ? 'bg-[#5D4037]' : 'bg-[#00308F]';
             return (
-                <div className="animate-enter space-y-12 pb-20">
-                    <button onClick={onBack} className="flex items-center text-base font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors"><Icon name="arrow-left" size={18} className="mr-2" /> Back to Roadmap</button>
-                    <div className={`${colorClass} rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden`}>
+                <div className="animate-enter space-y-8 pb-20">
+                    <button onClick={onBack} className="flex items-center text-sm font-black text-slate-400 hover:text-[#00308F] uppercase tracking-widest transition-colors"><Icon name="arrow-left" size={16} className="mr-2" /> Back</button>
+                    <div className={`${colorClass} rounded-[2.5rem] p-12 text-white shadow-xl relative overflow-hidden`}>
                         <div className="relative z-10">
-                            <h3 className="text-5xl font-black text-white leading-none tracking-tight">{book.title}</h3>
-                            <p className="text-white/70 font-bold uppercase mt-3 tracking-widest text-base relative z-10">{book.subtitle}</p>
+                            <h3 className="text-4xl md:text-5xl font-black text-white leading-none tracking-tight">{book.title}</h3>
+                            <p className="text-white/70 font-bold uppercase mt-3 tracking-widest text-sm relative z-10">{book.subtitle}</p>
                         </div>
-                        <div className="absolute -right-20 -bottom-20 opacity-10 rotate-12">
-                            <Icon name="book" size={300} />
-                        </div>
+                        <Icon name="book" size={200} className="absolute -right-10 -bottom-10 opacity-10 rotate-12" />
                     </div>
-
-                    <div className="grid lg:grid-cols-1 gap-12">
+                    <div className="grid lg:grid-cols-1 gap-8">
                         {book.sections.map((section, i) => (
-                            <div key={i} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm hover:shadow-xl transition-all">
-                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 border-b pb-6">
-                                    <div>
-                                        <h4 className="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">{section.title}</h4>
-                                        <p className="text-lg text-slate-500 font-bold mt-2">{section.desc}</p>
-                                    </div>
-                                    <Icon name="info" className="text-slate-200 mt-4 md:mt-0" size={40} />
-                                </div>
-                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div key={i} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm">
+                                <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tighter mb-2">{section.title}</h4>
+                                <p className="text-base text-slate-500 font-bold mb-6 italic">"{section.desc}"</p>
+                                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {section.subsections.map((sub, j) => (
-                                        <div key={j} className="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
-                                            <h5 className={`font-black uppercase text-sm tracking-widest mb-3 leading-none ${isBrown ? 'text-[#5D4037]' : 'text-[#00308F]'}`}>{sub.name}</h5>
-                                            <p className="text-xs text-slate-400 font-bold mb-4 leading-relaxed uppercase">{sub.detail}</p>
-                                            <div className="space-y-2">
-                                                {sub.items.map((item, k) => (<div key={k} className="flex items-center text-sm font-black text-slate-700 uppercase tracking-wider leading-tight"><div className={`w-1.5 h-1.5 rounded-full mr-2 ${isBrown ? 'bg-orange-300' : 'bg-blue-300'}`}></div>{item}</div>))}
+                                        <div key={j} className="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                                            <h5 className={`font-black uppercase text-xs tracking-widest mb-2 leading-none ${isBrown ? 'text-[#5D4037]' : 'text-[#00308F]'}`}>{sub.name}</h5>
+                                            <p className="text-[13px] text-slate-400 font-bold mb-4 leading-relaxed uppercase">{sub.detail}</p>
+                                            <div className="space-y-1.5">
+                                                {sub.items.map((item, k) => (<div key={k} className="flex items-center text-[13px] font-black text-slate-700 uppercase tracking-wider leading-tight"><div className={`w-1.5 h-1.5 rounded-full mr-2 ${isBrown ? 'bg-orange-300' : 'bg-blue-300'}`}></div>{item}</div>))}
                                             </div>
                                         </div>
                                     ))}
@@ -286,27 +250,26 @@
             );
         };
 
-        const CFDCView = ({ courses }) => {
-            const [selectedId, setSelectedId] = useState(null);
-            if (selectedId && courses[selectedId]) {
-                const course = courses[selectedId];
+        const CFDCView = ({ selectedId, setSelectedId }) => {
+            if (selectedId && CFDC_DATA[selectedId]) {
+                const course = CFDC_DATA[selectedId];
                 return (
                     <div className="animate-enter space-y-8">
-                        <button onClick={() => setSelectedId(null)} className="flex items-center text-base font-black text-slate-400 uppercase tracking-widest"><Icon name="arrow-left" size={18} className="mr-2" /> Catalog</button>
-                        <div className="bg-[#00308F] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden"><h3 className="text-6xl font-black text-white relative z-10 leading-none">{course.title}</h3><p className="text-blue-200 font-bold uppercase mt-4 tracking-widest text-lg relative z-10">{course.subtitle}</p><a href={course.enrollmentLink} target="_blank" className="mt-12 inline-block bg-white text-[#00308F] px-12 py-5 rounded-2xl font-black uppercase text-sm shadow-xl hover:scale-105 transition-all relative z-10 tracking-widest">Enrollment Portal</a><div className="absolute -right-20 -bottom-20 opacity-5"><Icon name="shield" size={300} /></div></div>
-                        <div className="grid md:grid-cols-2 gap-12 mt-12"><div className="space-y-6"><h4 className="font-black text-slate-900 uppercase text-sm tracking-widest border-b pb-2">Learning Objectives</h4>{(course.objectives || []).map((obj, i) => (<div key={i} className="flex items-start bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm font-bold text-lg text-slate-700"><Icon name="check-circle" className="text-green-500 mr-4 mt-1 flex-shrink-0" size={24} />{obj}</div>))}</div><div className="bg-slate-50 p-10 rounded-[3rem] space-y-6"><h4 className="font-black text-slate-900 uppercase text-sm tracking-widest border-b border-slate-200 pb-2">Course Overview</h4><p className="text-xl text-slate-600 leading-relaxed font-medium">{course.overview}</p></div></div>
+                        <button onClick={() => setSelectedId(null)} className="flex items-center text-sm font-black text-slate-400 uppercase tracking-widest"><Icon name="arrow-left" size={16} className="mr-2" /> Catalog</button>
+                        <div className="bg-[#00308F] rounded-[2.5rem] p-12 text-white shadow-xl relative overflow-hidden"><h3 className="text-5xl font-black text-white relative z-10 leading-none">{course.title}</h3><p className="text-blue-200 font-bold uppercase mt-3 tracking-widest text-base relative z-10">{course.subtitle}</p><a href={course.enrollmentLink} target="_blank" className="mt-8 inline-block bg-white text-[#00308F] px-10 py-5 rounded-xl font-black uppercase text-sm shadow-xl hover:scale-105 transition-all relative z-10 tracking-widest">Enrollment Portal</a><Icon name="shield" size={300} className="absolute -right-20 -bottom-20 opacity-5" /></div>
+                        <div className="grid md:grid-cols-2 gap-10 mt-10"><div className="space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b pb-3">Learning Objectives</h4>{(course.objectives || []).map((obj, i) => (<div key={i} className="flex items-start bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm font-bold text-base text-slate-700 leading-relaxed"><Icon name="check-circle" className="text-green-500 mr-4 mt-1 flex-shrink-0" size={20} />{obj}</div>))}</div><div className="bg-slate-50 p-10 rounded-[3rem] space-y-6"><h4 className="font-black text-slate-900 uppercase text-xs tracking-widest border-b border-slate-200 pb-3">Course Overview</h4><p className="text-lg text-slate-600 leading-relaxed font-medium">{course.overview}</p></div></div>
                     </div>
                 );
             }
             return (
-                <div className="animate-enter space-y-16">
-                    <h2 className="text-5xl font-black text-slate-900 tracking-tighter uppercase text-center">Course Catalog</h2>
+                <div className="animate-enter space-y-12">
+                    <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase text-center">Course Catalog</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         {['300', '500', '700'].map(id => (
-                            <div key={id} onClick={() => setSelectedId(id)} className="bg-white border border-slate-100 rounded-[3rem] p-10 hover:shadow-2xl transition-all cursor-pointer group relative overflow-hidden flex flex-col min-h-[400px]">
+                            <div key={id} onClick={() => setSelectedId(id)} className="bg-white border border-slate-100 rounded-[2.5rem] p-10 hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden flex flex-col min-h-[350px]">
                                 <div className="text-8xl font-black text-slate-50 absolute -right-2 -top-2 select-none">#{id}</div>
-                                <div className="relative z-10"><h4 className="text-4xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{courses[id]?.title || `CFDC ${id}`}</h4><p className="text-sm font-black text-[#00308F] uppercase mt-2 tracking-widest">{courses[id]?.subtitle}</p><div className="mt-8 bg-slate-50 px-4 py-2 rounded-lg text-xs font-black text-slate-400 uppercase w-fit tracking-widest">{courses[id]?.target}</div><p className="text-base text-slate-500 mt-8 leading-relaxed line-clamp-4 font-medium">{courses[id]?.overview || 'Course details loading...'}</p></div>
-                                <div className="mt-auto pt-8 flex items-center text-sm font-black text-slate-300 uppercase tracking-widest group-hover:text-[#00308F]">Details <Icon name="chevron-right" size={16} className="ml-2" /></div>
+                                <div className="relative z-10"><h4 className="text-3xl font-black text-slate-900 group-hover:text-[#00308F] transition-colors">{CFDC_DATA[id].title}</h4><p className="text-sm font-black text-[#00308F] uppercase mt-1 tracking-widest">{CFDC_DATA[id].subtitle}</p><div className="mt-6 bg-slate-50 px-4 py-1.5 rounded-lg text-xs font-black text-slate-400 uppercase w-fit tracking-widest">{CFDC_DATA[id].target}</div><p className="text-base text-slate-500 mt-6 leading-relaxed line-clamp-4 font-medium">{CFDC_DATA[id].overview}</p></div>
+                                <div className="mt-auto pt-6 flex items-center text-sm font-black text-slate-300 uppercase tracking-widest group-hover:text-[#00308F]">Details <Icon name="chevron-right" size={14} className="ml-2" /></div>
                             </div>
                         ))}
                     </div>
@@ -315,231 +278,160 @@
         };
 
         const HomeView = ({ onTabChange, onCategorySelect }) => (
-            <div className="space-y-16 animate-enter">
-                <div className="relative overflow-hidden rounded-[3.5rem] bg-gradient-to-br from-[#00308F] to-[#0B1F3F] p-12 md:p-20 text-white shadow-2xl text-center">
+            <div className="space-y-12 animate-enter">
+                <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-[#00308F] to-[#0B1F3F] p-12 md:p-20 text-white shadow-xl text-center">
                     <div className="relative z-10 max-w-4xl mx-auto">
                         <div className="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-8"><Icon name="shield" size={14} className="mr-2 text-blue-300"/> Force Development Hub</div>
-                        <h2 className="text-6xl md:text-8xl font-black mb-10 tracking-tighter uppercase text-white drop-shadow-sm leading-none">FORCE DEVELOPMENT HUB</h2>
+                        <h2 className="text-4xl md:text-7xl font-black mb-10 tracking-tighter uppercase text-white leading-none">FORCE DEVELOPMENT HUB</h2>
                         <div className="flex flex-wrap justify-center gap-6">
-                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-12 py-6 rounded-2xl font-black shadow-xl hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-widest">ENLISTED TRACK</button>
-                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-12 py-6 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-sm uppercase tracking-widest">CFDC PROGRAMS</button>
+                            <button onClick={() => onTabChange('enlisted')} className="bg-white text-[#00308F] px-10 py-5 rounded-2xl font-black shadow-lg hover:scale-105 active:scale-95 transition-all text-sm uppercase tracking-widest">ENLISTED TRACK</button>
+                            <button onClick={() => onTabChange('cfdc')} className="bg-transparent border-2 border-white/50 text-white px-10 py-5 rounded-2xl font-black hover:bg-white/10 active:scale-95 transition-all text-sm uppercase tracking-widest">CFDC PROGRAMS</button>
                         </div>
                     </div>
                 </div>
                 <div className="grid lg:grid-cols-2 gap-8">
                     {LEADERSHIP.map((leader, i) => (
-                        <div key={i} className="bg-white border border-slate-100 p-8 rounded-[2.5rem] flex items-center shadow-sm hover:shadow-lg transition-all">
-                            <div className="w-28 h-28 rounded-[1.5rem] overflow-hidden mr-8 shadow-md border-4 border-slate-50 flex-shrink-0"><img src={leader.img} alt={leader.name} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/112'} /></div>
-                            <div><h4 className="text-xl font-black text-slate-800 leading-tight tracking-tight">{leader.name}</h4><p className="text-sm font-black text-[#00308F] uppercase tracking-widest mt-1">{leader.title}</p><p className="text-xs text-slate-400 font-bold uppercase mt-1">{leader.org}</p></div>
+                        <div key={i} className="bg-white border border-slate-100 p-6 rounded-[2.5rem] flex items-center shadow-sm hover:shadow-lg transition-all">
+                            <div className="w-24 h-24 rounded-2xl overflow-hidden mr-6 shadow-md border-4 border-slate-50 flex-shrink-0"><img src={leader.img} alt={leader.name} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/96'} /></div>
+                            <div><h4 className="text-lg font-black text-slate-800 leading-tight tracking-tight">{leader.name}</h4><p className="text-sm font-black text-[#00308F] uppercase tracking-widest mt-0.5">{leader.title}</p><p className="text-xs text-slate-400 font-bold uppercase mt-0.5">{leader.org}</p></div>
                         </div>
                     ))}
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {[{ label: 'Courses', icon: 'graduation-cap', tab: 'cfdc' }, { label: 'Library', icon: 'library', tab: 'resources' }, { label: 'ALQs', icon: 'target', cat: 'ALQs' }, { label: 'Strategic', icon: 'globe', tab: 'strategy' }].map((item, i) => (
-                        <button key={i} onClick={() => item.tab ? onTabChange(item.tab) : onCategorySelect(item.cat)} className="flex flex-col items-center p-10 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-2xl transition-all group">
-                            <div className="bg-slate-50 p-6 rounded-3xl mb-4 group-hover:bg-blue-50 transition-colors"><Icon name={item.icon} size={40} className="text-[#00308F]" /></div>
+                        <button key={i} onClick={() => item.tab ? onTabChange(item.tab) : onCategorySelect(item.cat)} className="flex flex-col items-center p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all group">
+                            <div className="bg-slate-50 p-6 rounded-3xl mb-4 group-hover:bg-blue-50 transition-colors"><Icon name={item.icon} size={36} className="text-[#00308F]" /></div>
                             <span className="font-black text-slate-900 text-xs uppercase tracking-widest">{item.label}</span>
                         </button>
+                    ))}
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 pt-12 border-t border-slate-100">
+                    {UNITS.map((unit, i) => (
+                        <a key={i} href={unit.link} target="_blank" className="flex flex-col items-center p-6 bg-white border border-slate-100 rounded-[2rem] hover:border-blue-300 shadow-sm group transition-all">
+                            <div className="w-16 h-16 mb-4 flex items-center justify-center p-1 bg-slate-50 rounded-2xl group-hover:scale-110 transition-transform overflow-hidden"><img src={unit.img} alt={unit.name} className="max-w-full max-h-full object-contain" onError={(e) => e.target.src = 'https://via.placeholder.com/64'} /></div>
+                            <span className="font-black text-slate-700 text-[11px] uppercase tracking-widest text-center leading-tight">{unit.name}</span>
+                        </a>
                     ))}
                 </div>
             </div>
         );
 
-        const AdminLogin = ({ onLogin }) => {
-            const [pass, setPass] = useState('');
-            const [error, setError] = useState(false);
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                if (pass === ADMIN_PASSWORD) onLogin(); else setError(true);
-            };
-            return (
-                <div className="animate-enter max-w-md mx-auto py-20 px-4">
-                    <div className="bg-white p-10 rounded-[3rem] shadow-2xl border border-slate-100 text-center"><div className="bg-slate-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8"><Icon name="lock" size={32} className="text-[#00308F]" /></div><h3 className="text-2xl font-black text-slate-900 mb-6 uppercase tracking-tight text-[#00308F]">Admin Portal</h3><form onSubmit={handleSubmit} className="space-y-4"><input type="password" className={`w-full p-5 bg-slate-50 border rounded-2xl font-bold focus:ring-4 outline-none transition-all ${error ? 'border-red-500' : 'border-slate-100'}`} placeholder="Admin Key" value={pass} onChange={e => { setPass(e.target.value); setError(false); }} autoFocus /><button className="w-full bg-[#00308F] text-white py-5 rounded-2xl font-black uppercase text-xs shadow-xl tracking-widest">Authenticate</button></form></div>
-                </div>
-            );
-        };
-
-        const AdminView = ({ resources }) => {
-            const [form, setForm] = useState({ title: '', category: '', description: '', link: '' });
-            const handleSave = async (e) => {
-                e.preventDefault();
-                if (!db) return;
-                await db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').add({ ...form, dateAdded: new Date().toISOString() });
-                setForm({ title: '', category: '', description: '', link: '' });
-            };
-            return (
-                <div className="animate-enter grid lg:grid-cols-3 gap-12">
-                    <div className="bg-white border border-slate-100 p-8 rounded-[3rem] shadow-xl"><h3 className="font-black mb-6 uppercase text-sm">Add Resource</h3><form onSubmit={handleSave} className="space-y-4"><input className="w-full p-4 bg-slate-50 border rounded-2xl" placeholder="Title" value={form.title} onChange={e => setForm({...form, title: e.target.value})} /><select className="w-full p-4 bg-slate-50 border rounded-2xl" value={form.category} onChange={e => setForm({...form, category: e.target.value})}><option value="">Category</option><option value="Regulations">Regulations</option><option value="ALQs">ALQs</option><option value="Reading">Reading</option></select><textarea className="w-full p-4 bg-slate-50 border rounded-2xl h-32" placeholder="Description" value={form.description} onChange={e => setForm({...form, description: e.target.value})} /><input className="w-full p-4 bg-slate-50 border rounded-2xl" placeholder="Link URL" value={form.link} onChange={e => setForm({...form, link: e.target.value})} /><button className="w-full bg-[#00308F] text-white py-4 rounded-2xl font-black">Save Resource</button></form></div>
-                    <div className="lg:col-span-2 space-y-4">{resources.map(res => (<div key={res.id} className="bg-white p-6 border rounded-2xl flex justify-between"><div><h4 className="font-black">{res.title}</h4><span className="text-xs text-blue-600 font-bold uppercase">{res.category}</span></div><button onClick={() => db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').doc(res.id).delete()} className="text-red-500"><Icon name="trash-2" size={18}/></button></div>))}</div>
-                </div>
-            );
-        };
-
-        const RoadmapView = ({ data, title, userProgress, books, selectedBook, setSelectedBook, expandedTier, setExpandedTier }) => {
-            const { toggleItem, isComplete, getPercentage } = userProgress;
-            if (selectedBook) return <BookViewer book={BOOK_CONTENT[selectedBook]} onBack={() => setSelectedBook(null)} />;
-
-            return (
-                <div className="animate-enter space-y-12">
-                    <h2 className="text-5xl font-black text-center text-slate-900 tracking-tighter uppercase border-b border-slate-100 pb-12 leading-none">{title}</h2>
-                    {books && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-                            {Object.entries({blue: IMAGES.blueBook, brown: IMAGES.brownBook, blueprint: IMAGES.blueprint}).map(([key, img]) => (
-                                <button key={key} onClick={() => setSelectedBook(key)} className="bg-white border border-slate-100 p-8 rounded-[3rem] flex flex-col items-center hover:shadow-2xl transition-all group">
-                                    <div className="w-36 h-48 mb-6 rounded-md shadow-xl overflow-hidden group-hover:scale-105 transition-transform border border-slate-100"><img src={img} alt={key} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/144x192'} /></div>
-                                    <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em]">The {key.charAt(0).toUpperCase() + key.slice(1)} Book</h3>
-                                    <div className="mt-4 flex items-center text-xs font-black text-blue-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">Interactive View <Icon name="chevron-right" size={10} className="ml-1" /></div>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                    <div className="space-y-12 relative">
-                        <div className="absolute left-10 top-0 bottom-0 w-1 bg-slate-200/50 rounded-full"></div>
-                        {data.map((tier, i) => {
-                            const isOpen = expandedTier === i;
-                            const pct = getPercentage(tier.steps.map(s => `${tier.id}-${s}`));
-                            return (
-                                <div key={i} className="relative pl-24">
-                                    <div onClick={() => setExpandedTier(isOpen ? null : i)} className={`absolute left-0 top-0 w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-2xl border-8 border-white z-10 cursor-pointer transition-all ${isOpen ? 'bg-[#00308F] text-white scale-110' : 'bg-slate-100 text-slate-400'}`}><Icon name={tier.icon} size={36} /></div>
-                                    <div className={`rounded-[3rem] border bg-white transition-all overflow-hidden ${isOpen ? 'border-[#00308F] shadow-2xl' : 'border-slate-100 shadow-sm'}`}>
-                                        <div onClick={() => setExpandedTier(isOpen ? null : i)} className="p-10 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
-                                            <div><h4 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">{tier.title}</h4><p className="text-xs font-black text-[#00308F] uppercase mt-1 tracking-widest">{tier.ranks}</p></div>
-                                            <div className="text-right"><div className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-1 text-right">Tier Progress</div><div className="font-black text-slate-900 text-3xl leading-none">{pct}%</div></div>
-                                        </div>
-                                        {isOpen && (
-                                            <div className="p-12 bg-slate-50/50 animate-enter border-t border-slate-100">
-                                                <div className="grid md:grid-cols-2 gap-12">
-                                                    <div>
-                                                        <h5 className="font-black text-slate-400 uppercase text-xs tracking-widest mb-8 text-left">Track Milestones</h5>
-                                                        {tier.steps.map((step, j) => {
-                                                            const id = `${tier.id}-${step}`; const done = isComplete(id);
-                                                            return (
-                                                                <div key={j} onClick={() => toggleItem(id)} className={`flex items-center p-5 rounded-2xl border-2 mb-3 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200 shadow-none' : 'bg-white border-slate-100 shadow-sm hover:border-blue-200'}`}>
-                                                                    <div className={`w-8 h-8 rounded-lg mr-5 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={18}/>}</div>
-                                                                    <span className={`font-bold text-base ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                    <div className="grid gap-6 content-start">
-                                                        <h5 className="font-black text-slate-400 uppercase text-xs tracking-widest mb-4 text-left">Development Focus Areas</h5>
-                                                        {tier.focusAreas.map((f, j) => (<FocusAreaCard key={j} title={f.title} text={f.text} bullets={f.bullets} />))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            );
-        };
-
-        const ResourceView = ({ resources, categoryFilter, setCategoryFilter }) => {
-            const [searchTerm, setSearchTerm] = useState('');
-            const filtered = resources.filter(r => (r.title || "").toLowerCase().includes(searchTerm.toLowerCase()) && (categoryFilter === 'All' || r.category === categoryFilter));
-            return (
-                <div className="animate-enter space-y-12">
-                    <div className="flex flex-col md:flex-row justify-between border-b border-slate-100 pb-10 gap-8">
-                        <h2 className="text-4xl font-black uppercase text-slate-900 leading-none tracking-tight">Library</h2>
-                        <div className="relative"><Icon name="search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" /><input type="text" placeholder="Search resources..." className="pl-12 pr-6 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-base shadow-sm focus:ring-2 focus:ring-blue-100 w-full md:w-96 transition-all" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/></div>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                        {['All', 'Regulations', 'ALQs', 'Reading', 'Videos'].map(cat => (<button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${categoryFilter === cat ? 'bg-[#00308F] text-white shadow-lg' : 'bg-white border text-slate-400'}`}>{cat}</button>))}
-                    </div>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filtered.map(res => (<div key={res.id} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group flex flex-col h-full"><span className="bg-blue-50 text-[#00308F] px-5 py-2 rounded-full text-xs font-black uppercase mb-6 inline-block w-fit">{res.category}</span><h4 className="text-2xl font-black text-slate-900 mb-6 tracking-tight leading-tight">{res.title}</h4><p className="text-base text-slate-500 mb-8 leading-relaxed flex-grow">{res.description}</p><a href={res.link} target="_blank" className="flex items-center text-sm font-black text-[#00308F] uppercase tracking-widest hover:translate-x-1 transition-transform">Open Asset <Icon name="external-link" size={16} className="ml-2" /></a></div>))}
-                    </div>
-                </div>
-            );
-        };
-
         function App() {
             const [activeTab, setActiveTab] = useState('home');
-            const [user, setUser] = useState(null);
-            const [resources, setResources] = useState([]);
-            const [courses, setCourses] = useState({});
             const [categoryFilter, setCategoryFilter] = useState('All');
-            const [isAdminAuth, setIsAdminAuth] = useState(false);
             const [mobileOpen, setMobileOpen] = useState(false);
             const [expandedTier, setExpandedTier] = useState(0);
             const [selectedBook, setSelectedBook] = useState(null);
+            const [selectedId, setSelectedId] = useState(null); // Course selection
+            const [checkedItems, setCheckedItems] = useState({});
 
-            // Auth Hook
-            useEffect(() => {
-                if (!auth) return;
-                const initAuth = async () => {
-                    const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    try {
-                        if (token) await auth.signInWithCustomToken(token);
-                        else await auth.signInAnonymously();
-                    } catch (e) { console.error("Auth error", e); }
-                    auth.onAuthStateChanged(setUser);
-                };
-                initAuth();
-            }, []);
-
-            // Data Hook
-            useEffect(() => {
-                if (!user || !db) return;
-                const unsubRes = db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('resources').onSnapshot(snap => { const list = []; snap.forEach(d => list.push({ id: d.id, ...d.data() })); setResources(list); }, err => console.error(err));
-                const unsubCourses = db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('courses').onSnapshot(snap => {
-                        const data = {}; snap.forEach(d => data[d.id] = d.data());
-                        if (Object.keys(data).length === 0) { 
-                            Object.keys(CFDC_SEED).forEach(id => db.collection('artifacts').doc(firebaseAppId).collection('public').doc('data').collection('courses').doc(id).set(CFDC_SEED[id])); 
-                        } else { setCourses(data); }
-                    }, err => console.error(err));
-                return () => { unsubRes(); unsubCourses(); };
-            }, [user]);
-
-            const useProgressHook = (user) => {
-                const [progress, setProgress] = useState({});
-                useEffect(() => {
-                    if (!user || !db) return;
-                    const unsub = db.collection('artifacts').doc(firebaseAppId).collection('users').doc(user.uid).collection('progress').onSnapshot((snap) => {
-                        const data = {}; snap.forEach(doc => { data[doc.id] = doc.data().completed; }); setProgress(data);
-                    }, err => console.error(err));
-                    return () => unsub();
-                }, [user]);
-                const toggleItem = async (id) => {
-                    if (!user || !db) return;
-                    await db.collection('artifacts').doc(firebaseAppId).collection('users').doc(user.uid).collection('progress').doc(id).set({ completed: !progress[id] }, { merge: true });
-                };
-                const getPercentage = (ids) => {
-                    if (!ids || !ids.length) return 0;
-                    const count = ids.filter(id => progress[id]).length;
-                    return Math.round((count / ids.length) * 100);
-                };
-                return { progress, toggleItem, isComplete: (id) => !!progress[id], getPercentage };
+            const toggleItem = (id) => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+            const isComplete = (id) => !!checkedItems[id];
+            const getPercentage = (steps, tierId) => {
+                const count = steps.filter(s => checkedItems[`${tierId}-${s}`]).length;
+                return Math.round((count / steps.length) * 100);
             };
 
-            const userProgress = useProgressHook(user);
-            const navItems = [{ id: 'home', label: 'Hub' }, { id: 'enlisted', label: 'Enlisted' }, { id: 'officer', label: 'Officer' }, { id: 'cfdc', label: 'Courses' }, { id: 'resources', label: 'Library' }, { id: 'admin', label: 'Admin' }];
+            const RoadmapView = ({ data, title, books }) => {
+                if (selectedBook) return <BookViewer book={BOOK_CONTENT[selectedBook]} onBack={() => setSelectedBook(null)} />;
+                return (
+                    <div className="animate-enter space-y-12">
+                        <h2 className="text-4xl font-black text-center text-slate-900 tracking-tighter uppercase border-b border-slate-100 pb-10 leading-none">{title}</h2>
+                        {books && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                                {Object.entries({blue: IMAGES.blueBook, brown: IMAGES.brownBook, blueprint: IMAGES.blueprint}).map(([key, img]) => (
+                                    <button key={key} onClick={() => setSelectedBook(key)} className="bg-white border border-slate-100 p-8 rounded-[3rem] flex flex-col items-center hover:shadow-xl transition-all group">
+                                        <div className="w-32 h-44 mb-6 rounded-md shadow-lg overflow-hidden group-hover:scale-105 transition-transform border border-slate-100"><img src={img} alt={key} className="w-full h-full object-cover" onError={(e) => e.target.src = 'https://via.placeholder.com/128x176'} /></div>
+                                        <h3 className="font-black text-slate-900 text-sm uppercase tracking-[0.2em]">The {key.charAt(0).toUpperCase() + key.slice(1)} Book</h3>
+                                        <div className="mt-4 flex items-center text-xs font-black text-blue-400 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all">View Detail <Icon name="chevron-right" size={12} className="ml-1" /></div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        <div className="space-y-12 relative">
+                            <div className="absolute left-10 top-0 bottom-0 w-1 bg-slate-200/50 rounded-full"></div>
+                            {data.map((tier, i) => {
+                                const isOpen = expandedTier === i;
+                                const pct = getPercentage(tier.steps, tier.id);
+                                return (
+                                    <div key={i} className="relative pl-24">
+                                        <div onClick={() => setExpandedTier(isOpen ? null : i)} className={`absolute left-0 top-0 w-20 h-20 rounded-[2rem] flex items-center justify-center shadow-lg border-8 border-white z-10 cursor-pointer transition-all ${isOpen ? 'bg-[#00308F] text-white scale-110' : 'bg-slate-100 text-slate-400'}`}><Icon name={tier.icon} size={32} /></div>
+                                        <div className={`rounded-[3rem] border bg-white transition-all overflow-hidden ${isOpen ? 'border-[#00308F] shadow-xl' : 'border-slate-100 shadow-sm'}`}>
+                                            <div onClick={() => setExpandedTier(isOpen ? null : i)} className="p-8 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+                                                <div><h4 className="text-2xl font-black text-slate-900 leading-tight tracking-tight">{tier.title}</h4><p className="text-sm font-black text-[#00308F] uppercase mt-1 tracking-widest">{tier.ranks}</p></div>
+                                                <div className="text-right"><div className="text-xs font-bold text-slate-300 uppercase tracking-widest mb-1 text-right">Tier Progress</div><div className="font-black text-slate-900 text-2xl leading-none">{pct}%</div></div>
+                                            </div>
+                                            {isOpen && (
+                                                <div className="p-10 bg-slate-50/50 animate-enter border-t border-slate-100">
+                                                    <div className="grid md:grid-cols-2 gap-10">
+                                                        <div>
+                                                            <h5 className="font-black text-slate-400 uppercase text-xs tracking-widest mb-6 text-left">Track Milestones</h5>
+                                                            {tier.steps.map((step, j) => {
+                                                                const uid = `${tier.id}-${step}`; const done = isComplete(uid);
+                                                                return (
+                                                                    <div key={j} onClick={() => toggleItem(uid)} className={`flex items-center p-4 rounded-2xl border-2 mb-3 cursor-pointer transition-all ${done ? 'bg-green-50 border-green-200' : 'bg-white border-slate-100 shadow-sm hover:border-blue-200'}`}>
+                                                                        <div className={`w-8 h-8 rounded-lg mr-4 flex items-center justify-center ${done ? 'bg-green-500 text-white' : 'bg-slate-100'}`}>{done && <Icon name="check" size={16}/>}</div>
+                                                                        <span className={`font-bold text-base ${done ? 'text-green-800' : 'text-slate-700'}`}>{step}</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                        <div className="grid gap-6 content-start">
+                                                            <h5 className="font-black text-slate-400 uppercase text-xs tracking-widest mb-4 text-left">Development Focus</h5>
+                                                            {tier.focusAreas.map((f, j) => (<FocusAreaCard key={j} title={f.title} text={f.text} bullets={f.bullets} />))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            };
+
+            const ResourceViewComp = () => {
+                const [searchTerm, setSearchTerm] = useState('');
+                const filtered = RESOURCES_DATA.filter(r => r.title.toLowerCase().includes(searchTerm.toLowerCase()) && (categoryFilter === 'All' || r.category === categoryFilter));
+                return (
+                    <div className="animate-enter space-y-12">
+                        <div className="flex flex-col md:flex-row justify-between border-b border-slate-100 pb-10 gap-8">
+                            <h2 className="text-4xl font-black uppercase text-slate-900 leading-none tracking-tight">Library</h2>
+                            <div className="relative"><Icon name="search" size={24} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" /><input type="text" placeholder="Search..." className="pl-12 pr-6 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-xl shadow-sm focus:ring-2 focus:ring-blue-100 w-full md:w-[28rem] transition-all" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/></div>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            {['All', 'Regulations', 'ALQs', 'Reading', 'Videos'].map(cat => (<button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${categoryFilter === cat ? 'bg-[#00308F] text-white shadow-lg' : 'bg-white border text-slate-400'}`}>{cat}</button>))}
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filtered.map(res => (<div key={res.id} className="bg-white border border-slate-100 p-10 rounded-[3rem] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all group flex flex-col h-full"><span className="bg-blue-50 text-[#00308F] px-4 py-1.5 rounded-full text-xs font-black uppercase mb-6 inline-block w-fit">{res.category}</span><h4 className="text-2xl font-black text-slate-900 mb-6 tracking-tight leading-tight">{res.title}</h4><p className="text-base text-slate-500 mb-8 leading-relaxed flex-grow">{res.description}</p><a href={res.link} target="_blank" className="flex items-center text-sm font-black text-[#00308F] uppercase tracking-widest hover:translate-x-1 transition-transform">Open Asset <Icon name="external-link" size={16} className="ml-2" /></a></div>))}
+                        </div>
+                    </div>
+                );
+            };
+
+            const navItems = [{ id: 'home', label: 'Hub' }, { id: 'enlisted', label: 'Enlisted' }, { id: 'officer', label: 'Officer' }, { id: 'cfdc', label: 'Courses' }, { id: 'resources', label: 'Library' }];
 
             return (
                 <div className="flex flex-col min-h-screen selection:bg-[#00308F] selection:text-white bg-slate-50 font-sans">
                     <header className="glass-header border-b h-24 flex items-center sticky top-0 z-50 shadow-sm">
                         <div className="max-w-7xl mx-auto px-4 w-full flex justify-between items-center h-full">
-                            <div className="flex items-center space-x-6 cursor-pointer group h-full" onClick={() => setActiveTab('home')}>
-                                <div className="bg-[#00308F] p-3 rounded-2xl shadow-xl text-white transition-all group-hover:scale-110 overflow-hidden w-14 h-14 flex items-center justify-center"><img src={IMAGES.logo} alt="Logo" className="max-w-full max-h-full object-contain" onError={(e) => e.target.src = 'https://via.placeholder.com/56?text=Logo'} /></div>
+                            <div className="flex items-center space-x-6 cursor-pointer group h-full" onClick={() => { setActiveTab('home'); setSelectedBook(null); setSelectedId(null); }}>
+                                <div className="bg-[#00308F] p-3 rounded-2xl shadow-xl text-white transition-all group-hover:scale-110 overflow-hidden w-12 h-12 flex items-center justify-center"><img src={IMAGES.logo} alt="Logo" className="max-w-full max-h-full object-contain" onError={(e) => e.target.src = 'https://via.placeholder.com/48'} /></div>
                                 <div className="flex flex-col"><h1 className="font-black text-3xl uppercase tracking-tighter text-slate-900 leading-none">CA ANG</h1><span className="text-xs font-black uppercase tracking-[0.2em] text-[#00308F] mt-1 opacity-60">Force Development Hub</span></div>
                             </div>
-                            <nav className="hidden lg:flex space-x-2">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setCategoryFilter('All'); setMobileOpen(false); }} className={`px-8 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] transition-all ${activeTab === item.id ? 'bg-[#00308F] text-white shadow-2xl translate-y-[-2px]' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}>{item.label}</button>))}</nav>
+                            <nav className="hidden lg:flex space-x-2">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setCategoryFilter('All'); setMobileOpen(false); setSelectedBook(null); setSelectedId(null); }} className={`px-8 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] transition-all ${activeTab === item.id ? 'bg-[#00308F] text-white shadow-2xl translate-y-[-2px]' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'}`}>{item.label}</button>))}</nav>
                             <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-3 text-slate-400 hover:text-[#00308F] transition-colors"><Icon name={mobileOpen ? "x" : "menu"} size={32} /></button>
                         </div>
-                        {mobileOpen && (<div className="lg:hidden absolute top-24 left-0 w-full bg-white border-b shadow-2xl animate-enter z-50 p-8 flex flex-col gap-3">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setMobileOpen(false); }} className={`w-full text-left p-6 rounded-2xl font-black uppercase tracking-widest text-sm ${activeTab === item.id ? 'bg-[#00308F] text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>{item.label}</button>))}</div>)}
+                        {mobileOpen && (<div className="lg:hidden absolute top-24 left-0 w-full bg-white border-b shadow-2xl animate-enter z-50 p-8 flex flex-col gap-3">{navItems.map(item => (<button key={item.id} onClick={() => { setActiveTab(item.id); setMobileOpen(false); setSelectedBook(null); setSelectedId(null); }} className={`w-full text-left p-6 rounded-2xl font-black uppercase tracking-widest text-lg ${activeTab === item.id ? 'bg-[#00308F] text-white shadow-lg' : 'bg-slate-50 text-slate-400'}`}>{item.label}</button>))}</div>)}
                     </header>
-                    <main className="flex-grow max-w-7xl mx-auto w-full p-4 md:p-12">
+                    <main className="flex-grow max-w-7xl mx-auto w-full p-6 md:p-16">
                         {activeTab === 'home' && <HomeView onTabChange={setActiveTab} onCategorySelect={(c) => { setCategoryFilter(c); setActiveTab('resources'); }} />}
-                        {activeTab === 'enlisted' && (
-                            <RoadmapView data={ENLISTED_ROADMAP} title="Enlisted Continuum" type="enlisted" userProgress={userProgress} books={true} selectedBook={selectedBook} setSelectedBook={setSelectedBook} expandedTier={expandedTier} setExpandedTier={setExpandedTier} />
-                        )}
-                        {activeTab === 'officer' && <RoadmapView data={OFFICER_ROADMAP} title="Officer Continuum" type="officer" userProgress={userProgress} expandedTier={expandedTier} setExpandedTier={setExpandedTier} />}
-                        {activeTab === 'cfdc' && <CFDCView courses={courses} />}
-                        {activeTab === 'resources' && <ResourceView resources={resources} categoryFilter={categoryFilter} setCategoryFilter={setCategoryFilter} />}
-                        {activeTab === 'admin' && (isAdminAuth ? <AdminView resources={resources} /> : <AdminLogin onLogin={() => setIsAdminAuth(true)} />)}
+                        {activeTab === 'enlisted' && <RoadmapView data={ENLISTED_ROADMAP} title="Enlisted path" books={true} />}
+                        {activeTab === 'officer' && <RoadmapView data={OFFICER_ROADMAP} title="Officer path" books={false} />}
+                        {activeTab === 'cfdc' && <CFDCView selectedId={selectedId} setSelectedId={setSelectedId} />}
+                        {activeTab === 'resources' && <ResourceViewComp />}
                     </main>
                     <footer className="bg-slate-900 text-slate-500 py-24 border-t-8 border-[#00308F]"><div className="max-w-7xl mx-auto px-4 text-center"><Icon name="shield" size={60} className="mx-auto mb-8 opacity-20" /><p className="text-xs font-black uppercase tracking-[0.5em] opacity-40">Integrity First • Service Before Self • Excellence In All We Do</p></div></footer>
                 </div>
